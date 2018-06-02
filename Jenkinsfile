@@ -1,7 +1,10 @@
+#!groovy
+
 pipeline {
   agent { label 'docker-agent' }
-  stages {
-    stage('Build') {
+  
+  stages {    
+    stage('Image Build') {
       when {
         branch 'master'
       }
@@ -9,15 +12,15 @@ pipeline {
         sh "docker build -t anirvan/hello-world:${env.BRANCH_NAME} ."
       }
     }
-    stage('Publish') {
+    stage('Push to Docker Registry') {
       when {
         branch 'master'
       }
       steps {
         withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
+          sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
           sh "docker push anirvan/hello-world:${env.BRANCH_NAME}"
         }
-
       }
     }
   }
