@@ -9,7 +9,9 @@ pipeline {
         branch 'master'
       }
       steps {
-        sh "docker build -t anirvan/hello-world:${env.BRANCH_NAME} ."
+        sh "git rev-parse HEAD > .git/commit-id"
+        def commit_id = readFile('.git/commit-id').trim()
+        sh "docker build -t anirvan/hello-world:${commit_id} ."
       }
     }
     stage('Push to Docker Registry') {
@@ -19,7 +21,7 @@ pipeline {
       steps {
         withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
           sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
-          sh "docker push anirvan/hello-world:${env.BRANCH_NAME}"
+          sh "docker push anirvan/hello-world:${commit_id}"
         }
       }
     }
