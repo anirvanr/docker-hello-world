@@ -5,13 +5,18 @@ def commit_id
 pipeline {
   agent { label 'docker-agent' }
   
+  stage('Get commit Id') {
+  node {
+      commit_id = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+      }
+    }
+  
   stages {    
     stage('Image Build') {
       when {
         branch 'master'
       }     
       steps {
-        commit_id = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
         sh "docker build -t anirvan/hello-world:${commit_id} ."
       }
     }
