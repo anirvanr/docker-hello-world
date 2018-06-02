@@ -8,8 +8,9 @@ pipeline {
       when {
         branch 'master'
       }
+      commit_id = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
       steps {
-        sh "docker build -t anirvan/hello-world:${env.GIT_COMMIT} ."
+        sh "docker build -t anirvan/hello-world:${commit_id} ."
       }
     }
     stage('Push to Docker Registry') {
@@ -19,7 +20,7 @@ pipeline {
       steps {
         withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
           sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
-          sh "docker push anirvan/hello-world:${env.GIT_COMMIT}"
+          sh "docker push anirvan/hello-world:${commit_id}"
         }
       }
     }
