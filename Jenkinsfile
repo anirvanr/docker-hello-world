@@ -46,6 +46,10 @@ pipeline {
                     helm repo add chartmuseum https://helmcharts.dynacommercelab.com --username admin --password C1@oHCR$
                     helm repo update
                     helm search chartmuseum/ -l
+                    helm upgrade hello-world --namespace preview chartmuseum/hello-world --set image.tag=${env.commit_id}
+                    sleep 10
+                    ./kubectl get deployment hello-world -n preview -o wide
+                    helm ls -a
                '''
         }
       }
