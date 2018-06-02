@@ -22,7 +22,7 @@ pipeline {
       }
       steps {
         withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
-          sh "docker login -u ${env.dockerHubUser} --password-stdin ${env.dockerHubPassword}"
+          sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
           sh "docker push anirvan/hello-world:${commit_id}"
         }
       }
