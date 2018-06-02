@@ -7,6 +7,7 @@ pipeline {
   environment {
      commit_id = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
      image = 'hello-world'
+     organization = 'anirvan'
   }
   stages { 
     stage('Image Build') {
@@ -14,7 +15,7 @@ pipeline {
         branch 'master'
       }     
       steps {
-        sh "docker build -t ${env.dockerHubUser}/${env.image}:${env.commit_id} ."
+        sh "docker build -t ${env.organization}/${env.image}:${env.commit_id} ."
       }
     }
     stage('Push to Docker Registry') {
