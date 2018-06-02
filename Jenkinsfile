@@ -6,6 +6,7 @@ pipeline {
   }  
   environment {
      commit_id = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+     image = 'hello-world'
   }
   stages { 
     stage('Image Build') {
@@ -13,7 +14,7 @@ pipeline {
         branch 'master'
       }     
       steps {
-        sh "docker build -t anirvan/hello-world:${commit_id} ."
+        sh "docker build -t ${env.dockerHubUser}/${env.image}:${env.commit_id} ."
       }
     }
     stage('Push to Docker Registry') {
@@ -23,9 +24,19 @@ pipeline {
       steps {
         withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
           sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
-          sh "docker push anirvan/hello-world:${commit_id}"
+          sh "docker push ${env.dockerHubUser}/${env.image}:${env.commit_id}"
         }
       }
+    }
+    stage('deploy') {
+            // sh "ansible-playbook -i ./ansible/hosts ./ansible/deploy.yml"
+       steps {
+                sh 'echo "Hello World"'
+                sh '''
+                    echo "Multiline shell steps"
+                    ls –lah
+                '''
+            }
     }
   }
 }
