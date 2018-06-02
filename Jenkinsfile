@@ -29,11 +29,10 @@ pipeline {
         }
       }
     }
-    stage('deploy') {
+    stage('Deploy release') {
        steps {
-            // Kubectl setup
             configFileProvider([configFile(fileId: 'f5f75a53-52f5-4fe3-bdff-9f0709d38940', replaceTokens: true, targetLocation: 'config', variable: 'configfile')]) {        
-                sh '''
+                sh """
                     export KUBECONFIG=$PWD/config
                     apt-get update && apt-get -y install curl
                     curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && chmod +x kubectl
@@ -41,15 +40,13 @@ pipeline {
                     helm init --client-only
                     helm repo add chartmuseum https://helmcharts.dynacommercelab.com --username admin --password C1@oHCR$
                     helm repo update
-                    helm search chartmuseum/ -l
                     helm ls -a
-                    #helm upgrade hello-world --namespace preview chartmuseum/hello-world --set image.tag=${env.commit_id}
-                    helm upgrade hello-world --namespace preview chartmuseum/hello-world
+                    helm search chartmuseum/ -l
+                    helm upgrade hello-world --namespace preview chartmuseum/hello-world --set image.tag=${env.commit_id}
                     sleep 10
                     helm ls -a
                     ./kubectl get deployment hello-world -n preview -o wide
-                    
-                '''
+                  """
         }
       }
     }
