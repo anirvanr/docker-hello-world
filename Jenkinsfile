@@ -1,12 +1,12 @@
 #!groovy
 
 pipeline {
-  agent { label 'docker-agent' }
-     
+  agent { 
+    label 'docker-agent' 
+  }  
   environment {
      commit_id = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
-   }
-  
+  }
   stages { 
     stage('Image Build') {
       when {
