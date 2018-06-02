@@ -32,7 +32,7 @@ pipeline {
     stage('Deploy release') {
        steps {
             configFileProvider([configFile(fileId: 'f5f75a53-52f5-4fe3-bdff-9f0709d38940', replaceTokens: true, targetLocation: 'config', variable: 'configfile')]) {        
-                sh """
+                sh '''
                     export KUBECONFIG=$PWD/config
                     apt-get update && apt-get -y install curl
                     curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && chmod +x kubectl
@@ -47,7 +47,7 @@ pipeline {
                     sleep 10
                     helm ls -a
                     ./kubectl get deployment hello-world -n preview -o wide
-                  """
+                  '''
         }
       }
     }
