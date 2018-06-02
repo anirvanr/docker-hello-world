@@ -34,7 +34,7 @@ pipeline {
        steps {
             configFileProvider([configFile(fileId: 'f5f75a53-52f5-4fe3-bdff-9f0709d38940', replaceTokens: true, targetLocation: 'config', variable: 'configfile')]) {        
                 sh '''
-                    sh 'cat $configfile'
+                    cat $configfile
                     # apt-get update && apt-get -y install curl
                     # curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && chmod +x kubectl
                     ls -lah
