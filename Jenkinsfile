@@ -14,7 +14,7 @@ pipeline {
         branch 'master'
       }
       steps {
-        withDockerRegistry(credentialsId: 'docker-hub-credentials', url: 'https://hub.docker.com') {
+        withCredentials([credentialsId: 'docker-hub-credentials']) {
           sh "docker push anirvan/hello-world:${env.BRANCH_NAME}"
         }
 
