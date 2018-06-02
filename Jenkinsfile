@@ -1,7 +1,5 @@
 #!groovy
 
-def commit_id = ''
-
 pipeline {
   agent { label 'docker-agent' }
   
@@ -11,8 +9,8 @@ pipeline {
         branch 'master'
       }
       steps {
-        sh "git rev-parse HEAD > .git/commit-id"
-        commit_id = readFile('.git/commit-id').trim()
+        sh "git rev-parse --short HEAD > .git/commit-id"                        
+        commit_id = readFile('.git/commit-id')
         sh "docker build -t anirvan/hello-world:${commit_id} ."
       }
     }
