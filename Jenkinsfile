@@ -6,7 +6,7 @@ pipeline {
         branch 'master'
       }
       steps {
-        sh "docker build -t anirvan/hello-world:${GIT_SHA} ."
+        sh "docker build -t anirvan/hello-world:${env.BRANCH_NAME} ."
       }
     }
     stage('Publish') {
@@ -15,7 +15,7 @@ pipeline {
       }
       steps {
         withDockerRegistry(credentialsId: 'docker-hub-credentials', url: 'https://hub.docker.com') {
-          sh "docker push hub.docker.com/anirvan/hello-world:${GIT_SHA}"
+          sh "docker push hub.docker.com/anirvan/hello-world:${env.BRANCH_NAME}"
         }
 
       }
