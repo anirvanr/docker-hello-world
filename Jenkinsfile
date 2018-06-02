@@ -1,16 +1,13 @@
 #!groovy
 
-def commit_id
-
 pipeline {
   agent { label 'docker-agent' }
+     
+  environment {
+     commit_id = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+   }
   
   stages { 
-    stage('Get commit Id') {
-      node {
-        commit_id = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
-      }
-    }
     stage('Image Build') {
       when {
         branch 'master'
