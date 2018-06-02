@@ -5,12 +5,13 @@ pipeline {
   
   stages {    
     stage('Image Build') {
+      sh "git rev-parse HEAD > .git/commit-id"
+      def commit_id = readFile('.git/commit-id').trim()
       when {
         branch 'master'
       }
       steps {
-        sh "git rev-parse HEAD > .git/commit-id"
-        def commit_id = readFile('.git/commit-id').trim()
+  
         sh "docker build -t anirvan/hello-world:${commit_id} ."
       }
     }
