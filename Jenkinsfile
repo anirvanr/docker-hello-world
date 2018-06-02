@@ -15,7 +15,7 @@ pipeline {
       }
       steps {
         withDockerRegistry(credentialsId: 'docker-hub-credentials', url: 'https://hub.docker.com') {
-          sh "docker push hub.docker.com/anirvan/hello-world:${env.BRANCH_NAME}"
+          sh "docker push anirvan/hello-world:${env.BRANCH_NAME}"
         }
 
       }
