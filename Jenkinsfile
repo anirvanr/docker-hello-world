@@ -2,10 +2,8 @@
 
 pipeline {
   agent { label 'docker-agent' }
-  options {
-    ansiColor colorMapName: 'XTerm'
-  }
-  stages {
+  
+   stages {
     stage('Build') {
       when {
         branch 'master'
