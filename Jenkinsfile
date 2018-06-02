@@ -14,7 +14,7 @@ pipeline {
         branch 'master'
       }
       steps {
-        withCredentials([credentialsId: 'docker-hub-credentials']) {
+        withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
           sh "docker push anirvan/hello-world:${env.BRANCH_NAME}"
         }
 
