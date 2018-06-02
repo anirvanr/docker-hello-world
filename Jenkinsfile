@@ -1,9 +1,6 @@
-#!groovy
-
 pipeline {
-  agent { label 'docker-agent' }
-  
-   stages {
+  agent any
+  stages {
     stage('Build') {
       when {
         branch 'master'
@@ -17,9 +14,10 @@ pipeline {
         branch 'master'
       }
       steps {
-        withDockerRegistry([credentialsId: 'docker-hub-credentials', url: 'https://hub.docker.com']) {
+        withDockerRegistry(credentialsId: 'docker-hub-credentials', url: 'https://hub.docker.com') {
           sh "docker push hub.docker.com/anirvan/hello-world:${GIT_SHA}"
         }
+
       }
     }
   }
