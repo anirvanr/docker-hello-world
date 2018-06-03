@@ -16,7 +16,7 @@ pipeline {
         branch 'master'
       }     
       steps {
-        sh "docker build -t ${env.organization}/${env.image}:${env.commit_id} ."
+        sh "docker build -t ${organization}/${image}:${commit_id} ."
       }
     }
     stage('Push to Docker Registry') {
@@ -26,7 +26,7 @@ pipeline {
       steps {
         withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
           sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
-          sh "docker push ${env.dockerHubUser}/${env.image}:${env.commit_id}"
+          sh "docker push ${env.dockerHubUser}/${image}:${commit_id}"
         }
       }
     }
