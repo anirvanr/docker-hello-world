@@ -43,9 +43,9 @@ pipeline {
                     helm repo update
                     helm ls -a
                     helm search chartmuseum/ -l
-                    helm upgrade hello-world --namespace preview chartmuseum/hello-world --set image.tag=${commit_id}
+                    helm upgrade hello-world chartmuseum/hello-world --set image.tag=${commit_id} --install --namespace preview
                     helm ls -a
-                    #helm upgrade hello-world --namespace preview chartmuseum/hello-world
+                    helm history hello-world
                     #./kubectl get deployment hello-world -n preview -o wide
                 
                   '''
