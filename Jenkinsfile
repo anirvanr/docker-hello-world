@@ -8,7 +8,7 @@ pipeline {
      commit_id = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
      image = 'hello-world'
      organization = 'anirvan'
-     HELM_REPO_CREDS = credentials('helm-repo-cred')
+     HELM_REPO_CREDS = credentials('helm-repo-creds')
   }
   stages { 
     stage('Image Build') {
