@@ -6,7 +6,7 @@ pipeline {
   }  
   environment {
      COMMIT_ID = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
-     IMAGE = 'hello-world'
+     IMAGE_NAME = 'hello-world'
      ORGANIZATION = 'anirvan'
      HELM_REPO_CREDS = credentials('helm-repo-creds')
      K8S_NAMESPACE = 'preview'
@@ -18,7 +18,7 @@ pipeline {
         branch 'master'
       }     
       steps {
-        sh "docker build -t ${ORGANIZATION}/${IMAGE}:${COMMIT_ID} ."
+        sh "docker build -t ${ORGANIZATION}/${IMAGE_NAME}:${COMMIT_ID} ."
       }
     }
     stage('Push to Docker Registry') {
@@ -28,7 +28,7 @@ pipeline {
       steps {
         withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
           sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
-          sh "docker push ${env.dockerHubUser}/${IMAGE}:${COMMIT_ID}"
+          sh "docker push ${env.dockerHubUser}/${IMAGE_NAME}:${COMMIT_ID}"
         }
       }
     }
@@ -50,7 +50,7 @@ pipeline {
                     
                     helm search chartmuseum/ -l
                     echo "upgrade/install a release to a new version of a chart"
-                    helm upgrade hello-world chartmuseum/hello-world --version=${INIT_VER}-${COMMIT_ID} --set IMAGE.tag=${COMMIT_ID} --install --namespace ${K8S_NAMESPACE}
+                    helm upgrade hello-world chartmuseum/hello-world --version=${INIT_VER}-${COMMIT_ID} --set image.tag=${COMMIT_ID} --install --namespace ${K8S_NAMESPACE}
                     helm ls -a
                     helm history hello-world
                     
