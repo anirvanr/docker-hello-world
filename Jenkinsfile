@@ -42,14 +42,13 @@ pipeline {
                     helm init --client-only
                     helm repo add chartmuseum https://helmcharts.dynacommercelab.com --username ${HELM_REPO_CREDS_USR} --password ${HELM_REPO_CREDS_PSW}
                     
-                    ls -lash ${PWD}
                     helm plugin install https://github.com/chartmuseum/helm-push
                     helm push ${PWD}/charts/hello-world/ --version="$commit_id" chartmuseum
                     helm repo update
                     
                     helm search chartmuseum/ -l
                     echo "upgrade/install a release to a new version of a chart"
-                    helm upgrade hello-world chartmuseum/hello-world --set image.tag=${commit_id} --install --namespace preview
+                    helm upgrade hello-world chartmuseum/hello-world --version=${commit_id} --set image.tag=${commit_id} --install --namespace preview
                     helm ls -a
                     helm history hello-world
                     
