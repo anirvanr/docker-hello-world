@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-world
+  labels:
+    run: hello-world
+spec:
+  ports:
+  - port: 8000
+    protocol: TCP
+  selector:
+    run: hello-world
+  type: NodePort
