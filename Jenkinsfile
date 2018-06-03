@@ -9,6 +9,7 @@ pipeline {
      image = 'hello-world'
      organization = 'anirvan'
      HELM_REPO_CREDS = credentials('helm-repo-creds')
+     K8S_NAMESPACE = 'preview'
   }
   stages { 
     stage('Image Build') {
@@ -43,12 +44,12 @@ pipeline {
                     helm repo add chartmuseum https://helmcharts.dynacommercelab.com --username ${HELM_REPO_CREDS_USR} --password ${HELM_REPO_CREDS_PSW}
                     
                     helm plugin install https://github.com/chartmuseum/helm-push
-                    helm push ${PWD}/charts/hello-world/ --version="$commit_id" chartmuseum
+                    helm push ${PWD}/charts/hello-world/ --version=0.1.0-${commit_id} chartmuseum
                     helm repo update
                     
                     helm search chartmuseum/ -l
                     echo "upgrade/install a release to a new version of a chart"
-                    helm upgrade hello-world chartmuseum/hello-world --version=${commit_id} --set image.tag=${commit_id} --install --namespace preview
+                    helm upgrade hello-world chartmuseum/hello-world --version=0.1.0-${commit_id} --set image.tag=${commit_id} --install --namespace ${K8S_NAMESPACE}
                     helm ls -a
                     helm history hello-world
                     
