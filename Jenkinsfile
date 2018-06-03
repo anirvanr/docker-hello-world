@@ -5,11 +5,12 @@ pipeline {
     label 'docker-agent' 
   }  
   environment {
-     commit_id = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
-     image = 'hello-world'
-     organization = 'anirvan'
+     COMMIT_ID = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+     IMAGE = 'hello-world'
+     ORGANIZATION = 'anirvan'
      HELM_REPO_CREDS = credentials('helm-repo-creds')
      K8S_NAMESPACE = 'preview'
+     INIT_VER = '0.1.0'
   }
   stages { 
     stage('Image Build') {
@@ -17,7 +18,7 @@ pipeline {
         branch 'master'
       }     
       steps {
-        sh "docker build -t ${organization}/${image}:${commit_id} ."
+        sh "docker build -t ${ORGANIZATION}/${IMAGE}:${COMMIT_ID} ."
       }
     }
     stage('Push to Docker Registry') {
@@ -27,7 +28,7 @@ pipeline {
       steps {
         withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
           sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
-          sh "docker push ${env.dockerHubUser}/${image}:${commit_id}"
+          sh "docker push ${env.dockerHubUser}/${IMAGE}:${COMMIT_ID}"
         }
       }
     }
@@ -44,12 +45,12 @@ pipeline {
                     helm repo add chartmuseum https://helmcharts.dynacommercelab.com --username ${HELM_REPO_CREDS_USR} --password ${HELM_REPO_CREDS_PSW}
                     
                     helm plugin install https://github.com/chartmuseum/helm-push
-                    helm push ${PWD}/charts/hello-world/ --version=0.1.0-${commit_id} chartmuseum
+                    helm push ${PWD}/charts/hello-world/ --version=${INIT_VER}-${COMMIT_ID} chartmuseum
                     helm repo update
                     
                     helm search chartmuseum/ -l
                     echo "upgrade/install a release to a new version of a chart"
-                    helm upgrade hello-world chartmuseum/hello-world --version=0.1.0-${commit_id} --set image.tag=${commit_id} --install --namespace ${K8S_NAMESPACE}
+                    helm upgrade hello-world chartmuseum/hello-world --version=${INIT_VER}-${COMMIT_ID} --set IMAGE.tag=${COMMIT_ID} --install --namespace ${K8S_NAMESPACE}
                     helm ls -a
                     helm history hello-world
                     
