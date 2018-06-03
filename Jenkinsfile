@@ -37,17 +37,18 @@ pipeline {
                     export KUBECONFIG=$PWD/config
                     apt-get update && apt-get -y install curl
                     #curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && chmod +x kubectl
+                    #./kubectl get deployment hello-world -n preview -o wide
                     curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
                     helm init --client-only
                     helm repo add chartmuseum https://helmcharts.dynacommercelab.com --username ${HELM_REPO_CREDS_USR} --password ${HELM_REPO_CREDS_PSW}
                     helm repo update
                     helm ls -a
                     helm search chartmuseum/ -l
+                    echo "upgrade/install a release to a new version of a chart"
                     helm upgrade hello-world chartmuseum/hello-world --set image.tag=${commit_id} --install --namespace preview
                     helm ls -a
                     helm history hello-world
-                    #./kubectl get deployment hello-world -n preview -o wide
-                
+                    
                   '''
         }
       }
