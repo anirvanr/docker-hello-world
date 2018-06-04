@@ -36,7 +36,7 @@ pipeline {
        steps {
             configFileProvider([configFile(fileId: 'f5f75a53-52f5-4fe3-bdff-9f0709d38940', replaceTokens: true, targetLocation: 'config', variable: 'configfile')]) {        
                 sh '''
-                    ls -la ${pwd}/*
+                    
                     export KUBECONFIG=${PWD}/config
                     apt-get update && apt-get -y install curl
                     #curl -Lo kubectl https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl && chmod +x kubectl
@@ -46,6 +46,7 @@ pipeline {
                     helm repo add chartmuseum https://helmcharts.dynacommercelab.com --username ${HELM_REPO_CREDS_USR} --password ${HELM_REPO_CREDS_PSW}
                     
                     helm plugin install https://github.com/chartmuseum/helm-push
+                    ls -la ${pwd}/*
                     helm push ${PWD}/charts/hello-world/ --version=${INIT_VER}-${COMMIT_ID} chartmuseum
                     helm repo update
                     
