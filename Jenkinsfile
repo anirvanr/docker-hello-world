@@ -40,7 +40,7 @@ pipeline {
           withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL}" ]){
           sh '''
           IMAGE_HASH="$(docker pull $DOCKER_IMAGE | grep 'Digest: ' | sed 's/Digest: //')"
-          kubectl --namespace=development set image deployment/${env.NAME} ${env.NAME}=${env.DOCKER_IMAGE}@${IMAGE_HASH} --record
+          kubectl --namespace=development set image deployment/${NAME} ${NAME}=${DOCKER_IMAGE}@${IMAGE_HASH} --record
           '''
           }
         }
@@ -50,7 +50,7 @@ pipeline {
           expression { BRANCH_NAME ==~ /master/ }
       }
       steps {
-        sh 'kubectl --namespace=production set image deployment/${env.NAME} ${env.NAME}=${env.DOCKER_IMAGE}:${env.TAG} --record'
+        sh 'kubectl --namespace=production set image deployment/${NAME} ${NAME}=${DOCKER_IMAGE}:${TAG} --record'
       }
     }
   }
