@@ -21,7 +21,9 @@ pipeline {
         branch 'master'
       }
       steps {
+        withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL}" ]){
         sh 'docker push ${DOCKER_IMAGE}:${TAG}'
+        }
       }
     }
   }
