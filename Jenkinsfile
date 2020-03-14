@@ -43,7 +43,7 @@ pipeline {
           '''
           withCredentials([kubeconfigContent(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_CONTENT')]) {
           sh '''
-          use $KUBECONFIG_CONTENT 
+          cat $KUBECONFIG
           /usr/local/bin/kubectl --namespace=development set image deployment/${NAME} ${NAME}=${DOCKER_IMAGE}@${IMAGE_HASH} --record
           '''
           }
