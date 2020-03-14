@@ -8,7 +8,7 @@ pipeline {
     NEXUS_URL = 'https://dk.dynacommercelab.com'
     NEXUS_CREDENTIAL_ID = "nexus-credentials"
     DOCKER_IMAGE = 'dk.dynacommercelab.com/hello-world'
-    TAG = '1.0.1'
+    TAG = '1.0.2'
     }
   
   stages {
