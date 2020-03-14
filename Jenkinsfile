@@ -19,10 +19,12 @@ pipeline {
           if [[ "$BRANCH_NAME" =~ master ]] ; then
             docker build -f "Dockerfile" -t $DOCKER_IMAGE:$TAG .
             docker push $DOCKER_IMAGE:$TAG
-          else
+          elseif [[ "$BRANCH_NAME" =~ develop]] ; then
             # COMMIT_SHA = $(git rev-parse --short HEAD)
             docker build -f "Dockerfile" -t $DOCKER_IMAGE .
             docker push $DOCKER_IMAGE
+          else
+            echo 'Do that only on master or develop branch'
           fi
           '''
         }
