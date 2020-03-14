@@ -39,7 +39,7 @@ pipeline {
         steps {
           withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL}" ]){
           sh '''
-          IMAGE_HASH = $(docker pull $DOCKER_IMAGE | grep 'Digest: ' | sed 's/Digest: //')
+          IMAGE_HASH="$(docker pull $DOCKER_IMAGE | grep 'Digest: ' | sed 's/Digest: //')"
           kubectl --namespace=development set image deployment/${env.NAME} ${env.NAME}=${env.DOCKER_IMAGE}@${IMAGE_HASH} --record
           '''
           }
