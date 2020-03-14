@@ -43,8 +43,8 @@ pipeline {
           '''
           withCredentials([kubeconfigContent(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_CONTENT')]) {
           sh '''
-          echo "$KUBECONFIG_CONTENT" > kubeconfig
-          /usr/local/bin/kubectl --namespace=development set image deployment/${NAME} ${NAME}=${DOCKER_IMAGE}@${IMAGE_HASH} --record
+          echo "$KUBECONFIG_CONTENT" > kubeconfig 2>&1
+          /usr/local/bin/kubectl --kubeconfig=kubeconfig --namespace=development set image deployment/${NAME} ${NAME}=${DOCKER_IMAGE}@${IMAGE_HASH} --record
           '''
           }
         }
