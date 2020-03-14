@@ -17,11 +17,11 @@ pipeline {
           withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL}" ]){
           sh '''
           if [[ "$BRANCH_NAME" =~ master ]] ; then
-            docker build -t $DOCKER_IMAGE:$TAG .
+            docker build -f "Dockerfile" -t $DOCKER_IMAGE:$TAG .
             docker push $DOCKER_IMAGE:$TAG
           else
-            // COMMIT_SHA = $(git rev-parse --short HEAD)
-            docker build -t $DOCKER_IMAGE .
+            # COMMIT_SHA = $(git rev-parse --short HEAD)
+            docker build -f "Dockerfile" -t $DOCKER_IMAGE .
             docker push $DOCKER_IMAGE
           fi
           '''
