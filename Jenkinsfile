@@ -34,7 +34,7 @@ pipeline {
     }
     stage('Deploy development') {
         when {
-            expression { BRANCH_NAME ==~ develop }
+            expression { BRANCH_NAME ==~ /develop/ }
         }
         steps {
           withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL}" ]){
@@ -47,7 +47,7 @@ pipeline {
     }
     stage('Deploy production') {
       when {
-          expression { BRANCH_NAME ==~ master }
+          expression { BRANCH_NAME ==~ /master/ }
       }
       steps {
           sh '''
