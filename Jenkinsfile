@@ -17,11 +17,11 @@ pipeline {
         echo 'Dockerizing...'
           withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL}" ]){
           sh '''
-          if [[ "$BRANCH_NAME" =~ master ]]
+          if [[ BRANCH_NAME =~ master ]]
           then
             docker build -f "Dockerfile" -t $DOCKER_IMAGE:$TAG .
             docker push $DOCKER_IMAGE:$TAG
-          elif [[ "$BRANCH_NAME" =~ develop ]]
+          elif [[ BRANCH_NAME =~ develop ]]
           then
             docker build -f "Dockerfile" -t $DOCKER_IMAGE .
             docker push $DOCKER_IMAGE
@@ -34,7 +34,7 @@ pipeline {
     }
     stage('Deploy development') {
         when {
-            expression { BRANCH_NAME ==~ /develop/ }
+            expression { BRANCH_NAME ==~ develop }
         }
         steps {
           withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL}" ]){
@@ -47,7 +47,7 @@ pipeline {
     }
     stage('Deploy production') {
       when {
-          expression { BRANCH_NAME ==~ /master/ }
+          expression { BRANCH_NAME ==~ master }
       }
       steps {
           sh '''
