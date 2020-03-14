@@ -51,7 +51,6 @@ pipeline {
       }
       steps {
           sh '''
-          export KUBECONFIG=${PWD}/config
           /usr/local/bin/kubectl --namespace=production set image deployment/${NAME} ${NAME}=${DOCKER_IMAGE}:${TAG} --record
           '''
       }
