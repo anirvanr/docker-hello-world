@@ -38,11 +38,12 @@ pipeline {
         }
         steps {
           withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL}" ]){
-          sh '''IMAGE_HASH="$(docker pull $DOCKER_IMAGE | grep 'Digest: ' | sed 's/Digest: //')"'''
-          withCredentials([kubeconfigContent(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_CONTENT')]) {
           sh '''
-          echo "$KUBECONFIG_CONTENT" > kubeconfig          
-          /usr/local/bin/kubectl --kubeconfig=kubeconfig --namespace=development set image deployment/${NAME} ${NAME}=${DOCKER_IMAGE}@${IMAGE_HASH} --record
+          IMAGE_HASH="$(docker pull $DOCKER_IMAGE | grep 'Digest: ' | sed 's/Digest: //')"
+          '''
+          withCredentials([kubeconfigContent(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_CONTENT')]) {
+          sh '''       
+          /usr/local/bin/kubectl --kubeconfig=$KUBECONFIG_CONTENT --namespace=development set image deployment/${NAME} ${NAME}=${DOCKER_IMAGE}@${IMAGE_HASH} --record
           '''
           }
         }
@@ -55,8 +56,7 @@ pipeline {
       steps {
           withCredentials([kubeconfigContent(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_CONTENT')]) {
           sh '''
-          echo "$KUBECONFIG_CONTENT" > kubeconfig
-          /usr/local/bin/kubectl --namespace=production set image deployment/${NAME} ${NAME}=${DOCKER_IMAGE}:${TAG} --record
+          /usr/local/bin/kubectl --kubeconfig=$KUBECONFIG_CONTENT --namespace=production set image deployment/${NAME} ${NAME}=${DOCKER_IMAGE}:${TAG} --record
           '''
         }
       }
