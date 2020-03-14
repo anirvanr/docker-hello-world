@@ -4,6 +4,7 @@ pipeline {
   agent any
 
   environment {
+    NAME = 'hello-world'
     NEXUS_URL = 'https://dk.dynacommercelab.com'
     NEXUS_CREDENTIAL_ID = "nexus-credentials"
     DOCKER_IMAGE = 'dk.dynacommercelab.com/hello-world'
@@ -29,6 +30,25 @@ pipeline {
           fi
           '''
         }
+      }
+    }
+    stage('Deploy development') {
+        when {
+            expression { BRANCH_NAME ==~ /develop/ }
+        }
+        steps {
+          sh '''
+          IMAGE_HASH = $(docker pull ${env.DOCKER_IMAGE} | grep 'Digest: ' | sed 's/Digest: //')
+          kubectl --namespace=development set image deployment/${env.NAME} ${env.NAME}=${env.DOCKER_IMAGE}@${IMAGE_HASH} --record
+          '''
+        }
+      }
+    stage('Deploy production') {
+      when {
+          expression { BRANCH_NAME ==~ /master/ }
+      }
+      steps {
+        sh 'kubectl --namespace=production set image deployment/${env.NAME} ${env.NAME}=${env.DOCKER_IMAGE}:${env.TAG} --record'
       }
     }
   }
