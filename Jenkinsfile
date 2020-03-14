@@ -51,7 +51,8 @@ pipeline {
       }
       steps {
           sh '''
-          /usr/local/bin/kubectl --namespace=production set image deployment/${NAME} ${NAME}=${DOCKER_IMAGE}:${TAG} --record
+          IMAGE_HASH="$(docker pull $DOCKER_IMAGE:${TAG} | grep 'Digest: ' | sed 's/Digest: //')"
+          /usr/local/bin/kubectl --namespace=production set image deployment/${NAME} ${NAME}=${DOCKER_IMAGE}@${IMAGE_HASH} --record
           '''
       }
     }
