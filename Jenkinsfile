@@ -47,6 +47,7 @@ pipeline {
           }
         }
       }
+    }
     stage('Deploy production') {
       when {
           expression { BRANCH_NAME ==~ /master/ }
