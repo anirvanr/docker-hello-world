@@ -16,11 +16,12 @@ pipeline {
         echo 'Dockerizing...'
           withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL}" ]){
           sh '''
-          if [[ "$BRANCH_NAME" =~ master ]] ; then
+          if [[ "$BRANCH_NAME" =~ master ]]
+          then
             docker build -f "Dockerfile" -t $DOCKER_IMAGE:$TAG .
             docker push $DOCKER_IMAGE:$TAG
-          elif [[ "$BRANCH_NAME" =~ develop]] ; then
-            # COMMIT_SHA = $(git rev-parse --short HEAD)
+          elif [[ "$BRANCH_NAME" =~ develop ]]
+          then
             docker build -f "Dockerfile" -t $DOCKER_IMAGE .
             docker push $DOCKER_IMAGE
           else
