@@ -42,7 +42,8 @@ pipeline {
           IMAGE_HASH="$(docker pull $DOCKER_IMAGE | grep 'Digest: ' | sed 's/Digest: //')"
           '''
           withCredentials([kubeconfigContent(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_CONTENT')]) {
-          sh '''  
+          sh '''
+          use $KUBECONFIG_CONTENT 
           /usr/local/bin/kubectl --namespace=development set image deployment/${NAME} ${NAME}=${DOCKER_IMAGE}@${IMAGE_HASH} --record
           '''
           }
