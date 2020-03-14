@@ -4,6 +4,8 @@ pipeline {
   agent any
 
   environment {
+        NEXUS_URL = 'dk.dynacommercelab.com'
+        NEXUS_CREDENTIAL_ID = "nexus-credentials"
         DOCKER_IMAGE = 'dk.dynacommercelab.com/hello-world'
         TAG = 'latest'
     }
@@ -19,6 +21,7 @@ pipeline {
         branch 'master'
       }
       steps {
+        sh 'docker login -u user -p password NexusDockerRegistryUrl'
         sh 'docker push ${DOCKER_IMAGE}:${TAG}'
       }
     }
