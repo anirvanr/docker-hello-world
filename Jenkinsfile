@@ -25,7 +25,8 @@ pipeline {
             docker push $DOCKER_IMAGE
           fi
           '''
-          }
+        }
       }
     }
+  }
 }
