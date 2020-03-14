@@ -50,7 +50,12 @@ pipeline {
           expression { BRANCH_NAME ==~ /master/ }
       }
       steps {
-        sh '/usr/local/bin/kubectl --namespace=production set image deployment/${NAME} ${NAME}=${DOCKER_IMAGE}:${TAG} --record'
+          withCredentials([kubeconfigContent(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_CONTENT')]) {
+          sh '''
+          echo "$KUBECONFIG_CONTENT" > kubeconfig
+          /usr/local/bin/kubectl --namespace=production set image deployment/${NAME} ${NAME}=${DOCKER_IMAGE}:${TAG} --record
+          '''
+        }
       }
     }
   }
