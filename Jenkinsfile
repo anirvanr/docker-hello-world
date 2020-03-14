@@ -40,13 +40,8 @@ pipeline {
           withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL}" ]){
           sh '''
           IMAGE_HASH="$(docker pull $DOCKER_IMAGE | grep 'Digest: ' | sed 's/Digest: //')"
-          '''
-          withCredentials([kubeconfigContent(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_CONTENT')]) {
-          sh '''
-         export KUBECONFIG=$KUBECONFIG_CONTENT
           /usr/local/bin/kubectl --namespace=development set image deployment/${NAME} ${NAME}=${DOCKER_IMAGE}@${IMAGE_HASH} --record
           '''
-          }
         }
       }
     }
@@ -55,12 +50,10 @@ pipeline {
           expression { BRANCH_NAME ==~ /master/ }
       }
       steps {
-          withCredentials([kubeconfigContent(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_CONTENT')]) {
           sh '''
           export KUBECONFIG=${PWD}/config
           /usr/local/bin/kubectl --namespace=production set image deployment/${NAME} ${NAME}=${DOCKER_IMAGE}:${TAG} --record
           '''
-        }
       }
     }
   }
