@@ -21,7 +21,6 @@ pipeline {
         branch 'master'
       }
       steps {
-        sh 'docker login -u user -p password NexusDockerRegistryUrl'
         sh 'docker push ${DOCKER_IMAGE}:${TAG}'
       }
     }
