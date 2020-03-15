@@ -68,9 +68,10 @@ pipeline {
             }
         steps {
           script {
-              env.RELEASE_SCOPE = input message: 'User input required', ok: 'Release!',
-                      parameters: [choice(name: 'RELEASE_SCOPE', choices: 'patch\nminor\nmajor', description: 'What is the release scope?')]
+              IMAGE_PUSH = input message: 'User input required', ok: 'Publish!',
+              parameters: [choice(name: 'IMAGE_PUSH', choices: 'yes\nno', description: 'Do you want to approve the push in customer repo?')]
           }
+          echo "${IMAGE_PUSH}"
         withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL_MF}" ]){
           sh 'docker tag ${DOCKER_IMAGE}:${TAG} ${DOCKER_IMAGE_MF}:${TAG}'
           sh 'docker push ${DOCKER_IMAGE_MF}:${TAG}'
