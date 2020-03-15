@@ -81,6 +81,7 @@ pipeline {
         echo "don't do that"
         fi
         '''
+        }
       }
     }
   }
