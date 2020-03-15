@@ -10,18 +10,6 @@ pipeline {
     DOCKER_IMAGE = 'dk.dynacommercelab.com/hello-world'
     TAG = '1.0.3'
     }
-
-  def verify() {
-    stage('Verify') {
-        def userInput = input(
-            id: 'userInput', message: 'This is PRODUCTION!', parameters: [
-            [$class: 'BooleanParameterDefinition', defaultValue: false, description: '', name: 'Please confirm you sure to proceed']
-        ])
-        if(!userInput) {
-            error "Build wasn't confirmed"
-        }
-    }
-}
   
   stages {
     stage('Dockerize') {
@@ -80,6 +68,9 @@ pipeline {
             NEXUS_URL_MF = 'https://dkmf.dynacommercelab.com'
             }
       steps {
+        timeout(time: 1, unit: "MINUTES") {
+        input message: 'Do you want to approve the push in customer repo?', ok: 'Yes'
+        }
         withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL_MF}" ]){
           sh 'docker tag ${DOCKER_IMAGE}:${TAG} ${DOCKER_IMAGE_MF}:${TAG}'
           sh 'docker push ${DOCKER_IMAGE_MF}:${TAG}'
