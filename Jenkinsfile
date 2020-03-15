@@ -72,7 +72,7 @@ pipeline {
               parameters: [choice(name: 'Upload Docker image', choices: 'yes\nno', description: '')]
           }
         withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL_MF}" ]){
-        sh ''''
+        sh '''
         echo $IMAGE_PUSH
         if [[ $IMAGE_PUSH == 'yes' ]]
         then
