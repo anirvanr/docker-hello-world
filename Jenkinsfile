@@ -66,7 +66,7 @@ pipeline {
             DOCKER_IMAGE_MF = 'dkmf.dynacommercelab.com/hello-world'
             NEXUS_URL_MF = 'https://dkmf.dynacommercelab.com'
             }
-      steps {
+
           def userInput = true
           def didTimeout = false
           try {
@@ -85,6 +85,7 @@ pipeline {
                   echo "Aborted by: [${user}]"
               }
           }
+        steps {
         withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL_MF}" ]){
           sh 'docker tag ${DOCKER_IMAGE}:${TAG} ${DOCKER_IMAGE_MF}:${TAG}'
           sh 'docker push ${DOCKER_IMAGE_MF}:${TAG}'
