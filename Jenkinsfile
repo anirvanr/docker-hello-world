@@ -67,9 +67,15 @@ pipeline {
             NEXUS_URL_MF = 'https://dkmf.dynacommercelab.com'
             }
       steps {
-        timeout(time: 1, unit: "MINUTES") {
-        input message: 'Do you want to approve the push in customer repo?', ok: 'Yes'
-        }
+        def userInput = true
+        try {
+    timeout(time: 60, unit: 'SECONDS') { // change to a convenient timeout for you
+        userInput = input(
+        id: 'Proceed1', message: 'Was this successful?', parameters: [
+        [$class: 'BooleanParameterDefinition', defaultValue: true, description: '', name: 'Please confirm you agree with this']
+        ])
+    }
+}
         withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL_MF}" ]){
           sh 'docker tag ${DOCKER_IMAGE}:${TAG} ${DOCKER_IMAGE_MF}:${TAG}'
           sh 'docker push ${DOCKER_IMAGE_MF}:${TAG}'
