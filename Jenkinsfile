@@ -66,25 +66,6 @@ pipeline {
             DOCKER_IMAGE_MF = 'dkmf.dynacommercelab.com/hello-world'
             NEXUS_URL_MF = 'https://dkmf.dynacommercelab.com'
             }
-
-          def userInput = true
-          def didTimeout = false
-          try {
-              timeout(time: 60, unit: 'SECONDS') { // change to a convenient timeout for you
-                  userInput = input(
-                  id: 'Proceed1', message: 'Was this successful?', parameters: [
-                  [$class: 'BooleanParameterDefinition', defaultValue: true, description: '', name: 'Please confirm you agree with this']
-                  ])
-              }
-          } catch(err) { // timeout reached or input false
-              def user = err.getCauses()[0].getUser()
-              if('SYSTEM' == user.toString()) { // SYSTEM means timeout.
-                  didTimeout = true
-              } else {
-                  userInput = false
-                  echo "Aborted by: [${user}]"
-              }
-          }
         steps {
         withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL_MF}" ]){
           sh 'docker tag ${DOCKER_IMAGE}:${TAG} ${DOCKER_IMAGE_MF}:${TAG}'
