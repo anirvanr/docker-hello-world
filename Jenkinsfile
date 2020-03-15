@@ -69,7 +69,7 @@ pipeline {
         steps {
           script {
               IMAGE_PUSH = input message: 'User input required', ok: 'Continue!',
-              parameters: [choice(name: 'Upload Docker image', choices: 'yes\nno')]
+              parameters: [choice(name: 'Upload Docker image', choices: 'yes\nno', description: '')]
           }
           echo "${IMAGE_PUSH}"
         withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL_MF}" ]){
