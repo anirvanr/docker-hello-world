@@ -50,7 +50,6 @@ pipeline {
           expression { BRANCH_NAME ==~ /master/ }
       }
       steps {
-          verify()
           withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL}" ]){
           sh '''
           IMAGE_HASH="$(docker pull $DOCKER_IMAGE:${TAG} | grep 'Digest: ' | sed 's/Digest: //')"
