@@ -66,9 +66,9 @@ pipeline {
             DOCKER_IMAGE_MF = 'dkmf.dynacommercelab.com/hello-world'
             }
       steps {
-        withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL}" ]){
-          sh 'docker tag ${DOCKER_IMAGE}:${TAG} ${env.DOCKER_IMAGE_MF}:${TAG}'
-          sh 'docker push ${env.DOCKER_IMAGE_MF}:${TAG}'
+        withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "" ]){
+          sh 'docker tag ${DOCKER_IMAGE}:${TAG} ${DOCKER_IMAGE_MF}:${TAG}'
+          sh 'docker push ${DOCKER_IMAGE_MF}:${TAG}'
         }
       }
     }
