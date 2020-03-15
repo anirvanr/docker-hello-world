@@ -73,7 +73,8 @@ pipeline {
           }
         withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL_MF}" ]){
         sh ''''
-        if [[ $IMAGE_PUSH == "yes" ]]
+        echo $IMAGE_PUSH
+        if [[ $IMAGE_PUSH == yes ]]
         then
             docker tag ${DOCKER_IMAGE}:${TAG} ${DOCKER_IMAGE_MF}:${TAG}
             docker push ${DOCKER_IMAGE_MF}:${TAG}
