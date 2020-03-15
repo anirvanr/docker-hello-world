@@ -1,7 +1,7 @@
 #!groovy
 
 pipeline {
-  agent any
+  agent { node { label 'jk-slave' } }
 
   environment {
     NAME = 'hello-world'
