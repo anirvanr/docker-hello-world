@@ -34,7 +34,7 @@ pipeline {
     }
     stage('Deploy development') {
         when {
-            expression { BRANCH_NAME ==~ /develop/ }
+          expression { BRANCH_NAME ==~ /develop/ }
         }
         steps {
           withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL}" ]){
@@ -46,10 +46,10 @@ pipeline {
       }
     }
     stage('Deploy production') {
-      when {
+        when {
           expression { BRANCH_NAME ==~ /master/ }
-      }
-      steps {
+        }
+        steps {
           withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL}" ]){
           sh '''
           IMAGE_HASH="$(docker pull $DOCKER_IMAGE:${TAG} | grep 'Digest: ' | sed 's/Digest: //')"
@@ -59,16 +59,16 @@ pipeline {
       }
     }
     stage('Publish') {
-      when {
-        branch 'master'
-      }
-      environment {
-            DOCKER_IMAGE_MF = 'dkmf.dynacommercelab.com/hello-world'
-            NEXUS_URL_MF = 'https://dkmf.dynacommercelab.com'
-            }
+        when {
+          branch 'master'
+        }
+        environment {
+          DOCKER_IMAGE_MF = 'dkmf.dynacommercelab.com/hello-world'
+          NEXUS_URL_MF = 'https://dkmf.dynacommercelab.com'
+        }
         steps {
           script {
-              timeout(time: 15, unit: 'SECONDS') {
+              timeout(time: 1, unit: 'MINUTES') {
               env.IMAGE_PUSH = input message: 'User input required', ok: 'Continue',
               parameters: [choice(name: 'Upload docker image', choices: 'yes\nno', description: '')]
               }
