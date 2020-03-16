@@ -68,8 +68,10 @@ pipeline {
             }
         steps {
           script {
+              timeout(time: 15, unit: 'SECONDS') {
               env.IMAGE_PUSH = input message: 'User input required', ok: 'Continue',
-              parameters: [choice(name: 'Upload Docker image', choices: 'yes\nno', description: '')]
+              parameters: [choice(name: 'Upload docker image', choices: 'yes\nno', description: '')]
+              }
           withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL_MF}" ]){
           sh '''
           if [[ ${IMAGE_PUSH} == 'yes' ]]
