@@ -58,6 +58,15 @@ pipeline {
         }
       }
     }
+    stage('analyze') {
+          when {
+          branch 'master'
+        }
+        steps {
+          sh 'echo "dk.dynacommercelab.com/hello-world:latest `pwd`/Dockerfile" > anchore_images'
+          anchore name: 'anchore_images'
+          }
+        }
     stage('Publish') {
         when {
           branch 'master'
