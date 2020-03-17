@@ -4,11 +4,11 @@ pipeline {
   agent any
 
   environment {
-    NAME = 'hello-world'
-    NEXUS_URL = 'https://dk.dynacommercelab.com'
+    NAME = "hello-world"
+    NEXUS_URL = "https://dk.dynacommercelab.com"
     NEXUS_CREDENTIAL_ID = "nexus-credentials"
-    DOCKER_IMAGE = 'dk.dynacommercelab.com/hello-world'
-    TAG = '1.0.3'
+    DOCKER_IMAGE = "dk.dynacommercelab.com/${NAME}"
+    TAG = "1.0.3"
     }
   
   stages {
@@ -64,7 +64,7 @@ pipeline {
         }
         environment {
           DOCKER_IMAGE_MF = "dkmf.dynacommercelab.com/${NAME}"
-          NEXUS_URL_MF = 'https://dkmf.dynacommercelab.com'
+          NEXUS_URL_MF = "https://dkmf.dynacommercelab.com"
         }
         steps {
           script {
