@@ -64,7 +64,7 @@ pipeline {
         }
         steps {
           sh 'echo "dk.dynacommercelab.com/hello-world:latest `pwd`/Dockerfile" > anchore_images'
-          anchore name: 'anchore_images'    
+          anchore name: 'anchore_images', force: true    
           }
         }
     stage('teardown') {
