@@ -63,7 +63,7 @@ pipeline {
           branch 'master'
         }
         steps {
-          sh 'echo "dk.dynacommercelab.com/hello-world:latest `pwd`/Dockerfile" > anchore_images'
+          sh 'echo "dk.dynacommercelab.com/hello-world:latest `pwd`/Dockerfile" > anchore_images --force'
           anchore name: 'anchore_images'
           }
         }
