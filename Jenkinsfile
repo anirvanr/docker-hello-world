@@ -4,11 +4,11 @@ pipeline {
   agent any
 
   environment {
-    NAME = 'hello-docker'
-    NEXUS_URL = 'https://dk.dynacommercelab.com'
+    NAME = "hello-world"
+    NEXUS_URL = "https://dk.dynacommercelab.com"
     NEXUS_CREDENTIAL_ID = "nexus-credentials"
-    DOCKER_IMAGE = 'dk.dynacommercelab.com/hello-docker'
-    TAG = '1.0.3'
+    DOCKER_IMAGE = "dk.dynacommercelab.com/${NAME}"
+    TAG = "1.0.3"
     }
   
   stages {
@@ -58,13 +58,22 @@ pipeline {
         }
       }
     }
+    stage('analyze') {
+          when {
+          branch 'master'
+        }
+        steps {
+          sh 'echo "dk.dynacommercelab.com/hello-world:latest `pwd`/Dockerfile" > anchore_images'
+          anchore name: 'anchore_images'
+          }
+        }
     stage('Publish') {
         when {
           branch 'master'
         }
         environment {
-          DOCKER_IMAGE_MF = 'dkmf.dynacommercelab.com/${NAME}'
-          NEXUS_URL_MF = 'https://dkmf.dynacommercelab.com'
+          DOCKER_IMAGE_MF = "dkmf.dynacommercelab.com/${NAME}"
+          NEXUS_URL_MF = "https://dkmf.dynacommercelab.com"
         }
         steps {
           script {
