@@ -64,11 +64,15 @@ pipeline {
         }
         steps {
           sh 'echo "dk.dynacommercelab.com/hello-world:latest `pwd`/Dockerfile" > anchore_images'
-          anchore name: 'anchore_images', forceAnalyze: true
-          sh'''
-            for i in `cat anchore_images | awk '{print $1}'`;do docker rmi $i; done
-          '''
+          anchore name: 'anchore_images', forceAnalyze: true  
           }
+        }
+    stage('teardown') {
+            steps {
+                sh'''
+                    for i in `cat anchore_images | awk '{print $1}'`;do docker rmi $i; done
+                '''
+            }
         }
     stage('Publish') {
         when {
