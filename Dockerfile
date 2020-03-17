@@ -1,5 +1,5 @@
 FROM busybox
-MAINTAINER Chris <c@crccheck.com>
+LABEL Chris <c@crccheck.com>
 
 ADD index.html /www/index.html
 
