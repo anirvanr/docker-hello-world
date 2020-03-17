@@ -63,8 +63,9 @@ pipeline {
           branch 'master'
         }
         steps {
-          sh 'echo "dk.dynacommercelab.com/hello-world:latest `pwd`/Dockerfile" > anchore_images --force'
+          sh 'echo "dk.dynacommercelab.com/hello-world:latest `pwd`/Dockerfile" > anchore_images'
           anchore name: 'anchore_images'
+          anchore forceAnalyze: 1
           }
         }
     stage('teardown') {
