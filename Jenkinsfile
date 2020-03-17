@@ -63,7 +63,7 @@ pipeline {
           branch 'master'
         }
         environment {
-          DOCKER_IMAGE_MF = 'dkmf.dynacommercelab.com/${env.NAME}'
+          DOCKER_IMAGE_MF = "dkmf.dynacommercelab.com/${NAME}"
           NEXUS_URL_MF = 'https://dkmf.dynacommercelab.com'
         }
         steps {
