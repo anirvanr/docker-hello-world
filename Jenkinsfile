@@ -4,10 +4,10 @@ pipeline {
   agent any
 
   environment {
-    NAME = 'hello-world'
+    NAME = 'hello-docker'
     NEXUS_URL = 'https://dk.dynacommercelab.com'
     NEXUS_CREDENTIAL_ID = "nexus-credentials"
-    DOCKER_IMAGE = 'dk.dynacommercelab.com/hello-world'
+    DOCKER_IMAGE = 'dk.dynacommercelab.com/hello-docker'
     TAG = '1.0.3'
     }
   
