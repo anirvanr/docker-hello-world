@@ -20,11 +20,11 @@ pipeline {
           if [[ ${BRANCH_NAME} =~ master ]]
           then
             docker build -f "Dockerfile" -t ${DOCKER_IMAGE}:${TAG} .
-            docker push ${DOCKER_IMAGE}:${TAG}
+            docker push ${DOCKER_IMAGE}:${TAG} || { >&2 echo "Failed to push tag '${TAG}' image ${DOCKER_IMAGE}"; exit 1; }
           elif [[ ${BRANCH_NAME} =~ develop ]]
           then
-            docker build -f "Dockerfile" -t ${DOCKER_IMAGE} .
-            docker push ${DOCKER_IMAGE}
+            docker build -f "Dockerfile" -t ${DOCKER_IMAGE}:latest .
+            docker push ${DOCKER_IMAGE} || { >&2 echo "Failed to push tag 'latest' image ${DOCKER_IMAGE}"; exit 1; }
           else
             echo 'Do that only on master or develop branch'
           fi
