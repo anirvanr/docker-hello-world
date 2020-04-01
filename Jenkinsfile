@@ -58,42 +58,42 @@ pipeline {
         }
       }
     }
-    stage('analyze') {
-          when {
-          branch 'master'
-        }
-        steps {
-          sh 'echo "dk.dynacommercelab.com/hello-world:latest `pwd`/Dockerfile" > anchore_images'
-          anchore name: 'anchore_images'
-          }
-        }
-    stage('Publish') {
-        when {
-          branch 'master'
-        }
-        environment {
-          DOCKER_IMAGE_MF = "dkmf.dynacommercelab.com/${NAME}"
-          NEXUS_URL_MF = "https://dkmf.dynacommercelab.com"
-        }
-        steps {
-          script {
-              timeout(time: 1, unit: 'MINUTES') {
-              env.IMAGE_PUSH = input message: 'User input required', ok: 'Continue',
-              parameters: [choice(name: 'Upload docker image', choices: 'yes\nno', description: '')]
-              }
-          withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL_MF}" ]){
-          sh '''
-          if [[ ${IMAGE_PUSH} == 'yes' ]]
-          then
-              docker tag ${DOCKER_IMAGE}:${TAG} ${DOCKER_IMAGE_MF}:${TAG}
-              docker push ${DOCKER_IMAGE_MF}:${TAG}
-          else
-            echo "don't do that"
-          fi
-          '''
-          } 
-        } 
-      }
-    }
+    // stage('analyze') {
+    //       when {
+    //       branch 'master'
+    //     }
+    //     steps {
+    //       sh 'echo "dk.dynacommercelab.com/hello-world:latest `pwd`/Dockerfile" > anchore_images'
+    //       anchore name: 'anchore_images'
+    //       }
+    //     }
+    // stage('Publish') {
+    //     when {
+    //       branch 'master'
+    //     }
+    //     environment {
+    //       DOCKER_IMAGE_MF = "dkmf.dynacommercelab.com/${NAME}"
+    //       NEXUS_URL_MF = "https://dkmf.dynacommercelab.com"
+    //     }
+    //     steps {
+    //       script {
+    //           timeout(time: 1, unit: 'MINUTES') {
+    //           env.IMAGE_PUSH = input message: 'User input required', ok: 'Continue',
+    //           parameters: [choice(name: 'Upload docker image', choices: 'yes\nno', description: '')]
+    //           }
+    //       withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL_MF}" ]){
+    //       sh '''
+    //       if [[ ${IMAGE_PUSH} == 'yes' ]]
+    //       then
+    //           docker tag ${DOCKER_IMAGE}:${TAG} ${DOCKER_IMAGE_MF}:${TAG}
+    //           docker push ${DOCKER_IMAGE_MF}:${TAG}
+    //       else
+    //         echo "don't do that"
+    //       fi
+    //       '''
+    //       } 
+    //     } 
+    //   }
+    // }
   }
 }
