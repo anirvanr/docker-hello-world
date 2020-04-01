@@ -6,4 +6,3 @@ EXPOSE 8000
 
 # Create a basic webserver and sleep forever
 CMD httpd -p 8000 -h /www; tail -f /dev/null
-
