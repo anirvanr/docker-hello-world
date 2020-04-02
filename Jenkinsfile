@@ -14,7 +14,7 @@ pipeline {
     container_name = "hello-world"
     nexus_url = "dk.dynacommercelab.com"
     nexus_creds_id = "nexus-credentials"
-    docker_image = "dk.dynacommercelab.com/${container_name}"
+    docker_image = "${nexus_url}/${container_name}"
     build_tag = "1.0.3"
     }
 
@@ -34,7 +34,7 @@ pipeline {
     stage('Dockerize') {
       steps {
         echo 'Dockerizing...'
-          withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "${nexus_url}" ]){
+          withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "https://${nexus_url}" ]){
           sh '''
           if [[ ${BRANCH_NAME} =~ master ]]
           then
