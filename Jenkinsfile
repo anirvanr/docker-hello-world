@@ -10,7 +10,7 @@ def kubectlTest() {
 
 def helmLint(String chart_dir) {
     // lint helm chart
-    sh "/usr/local/bin/helm lint ${chart_dir}"
+    sh "/usr/local/bin/helm lint ${chart_dir} -f ${chart_dir}/${deployEnv}-values.yaml"
 }
 
 def helmDeploy(Map args) {
