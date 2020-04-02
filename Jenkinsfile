@@ -7,9 +7,8 @@
 
 }
 node {
-    // def inputFile = readFile('config.json')
-    def projects = readJSON file: "${env.WORKSPACE}\\config.json"
-    // def config = new groovy.json.JsonSlurperClassic().parseText(inputFile)
+    def inputFile = readFile('${env.WORKSPACE}\\config.json')
+    def config = new groovy.json.JsonSlurperClassic().parseText(inputFile)
     println "pipeline config ==> ${config}"
 }
 
