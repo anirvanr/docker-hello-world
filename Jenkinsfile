@@ -92,7 +92,7 @@ pipeline {
         name          : app_name,
         chart_dir     : chart_dir,
         tag           : build_tag,
-        namespace     : ${deployEnv}
+        namespace     : deployEnv
         )
         }
       }
