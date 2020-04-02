@@ -92,6 +92,7 @@ pipeline {
         }
       }
     }
+<<<<<<< HEAD
     stage ('helm test') {
       steps{
         script {
@@ -102,6 +103,23 @@ pipeline {
           } else{
             deployEnv = "none"
             error "Building unknown branch"
+||||||| merged common ancestors
+    stage('analyze') {
+          when {
+          branch 'master'
+        }
+        steps {
+          sh 'echo "dk.dynacommercelab.com/hello-world:latest `pwd`/Dockerfile" > anchore_images'
+          anchore name: 'anchore_images'
+=======
+    stage('analyze') {
+          when {
+          branch 'master'
+        }
+        steps {
+          sh 'echo "dk.dynacommercelab.com/hello-world:latest `pwd`/Dockerfile" > anchore_images'
+          anchore name: 'anchore_images', forceAnalyze: true  
+>>>>>>> master
           }
           def pwd = pwd()
           def app_name = "${container_name}"
