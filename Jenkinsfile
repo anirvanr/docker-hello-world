@@ -76,11 +76,13 @@ pipeline {
           withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "https://${nexus_url}" ]){
           script {
             if ( env.BRANCH_NAME == "develop" ){
-              deployEnv = "staging"
+            sh '''
               docker build -f "Dockerfile" -t ${docker_image}:latest .
+            '''
             } else if ( env.BRANCH_NAME == "master" ){
-              deployEnv = "production"
+            sh '''
               docker build -f "Dockerfile" -t ${docker_image}:${build_tag} .
+            '''
             } else{
               deployEnv = "none"
               error "Building unknown branch"
