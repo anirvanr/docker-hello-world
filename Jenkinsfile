@@ -38,7 +38,7 @@ pipeline {
     docker_image = "${nexus_url}/${container_name}"
     build_tag = "1.0.3"
     }
-
+  stages {
     stage('read') {
         steps {
           script {
