@@ -18,10 +18,10 @@ def helmDeploy(Map args) {
     //configure helm client and confirm tiller process is installed
     if (args.dry_run) {
         println "Running dry-run deployment"
-        sh "/usr/local/bin/helm upgrade --dry-run --debug --install ${args.name} ${args.chart_dir} --set ImageTag=${args.tag} --namespace=${args.namespace}"
+        sh "/usr/local/bin/helm upgrade --dry-run --debug --install ${args.name} ${args.chart_dir} --namespace=${args.namespace}"
     } else {
         println "Running deployment"
-        sh "/usr/local/bin/helm upgrade --install ${args.name} ${args.chart_dir} --set ImageTag=${args.tag} --namespace=${args.namespace}"
+        sh "/usr/local/bin/helm upgrade --install ${args.name} ${args.chart_dir} --namespace=${args.namespace}"
         echo "Application ${args.name} successfully deployed. Use helm status ${args.name} to check"
     }
 }
@@ -77,12 +77,12 @@ pipeline {
           script {
             if ( env.BRANCH_NAME == "develop" ){
             sh '''
-              docker build -f "Dockerfile" -t ${docker_image}:latest
+              docker build -f "Dockerfile" -t ${docker_image}:latest .
               docker push ${docker_image} || { >&2 echo "Failed to push build_tag 'latest' image ${docker_image}"; exit 1; }
             '''
             } else if ( env.BRANCH_NAME == "master" ){
             sh '''
-              docker build -f "Dockerfile" -t ${docker_image}:${build_tag}
+              docker build -f "Dockerfile" -t ${docker_image}:${build_tag} .
               docker push ${docker_image}:${build_tag} || { >&2 echo "Failed to push build_tag '${build_tag}' image ${docker_image}"; exit 1; }
             '''
             } else{
