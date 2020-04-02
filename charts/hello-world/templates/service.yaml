@@ -1,13 +1,14 @@
+---
 apiVersion: v1
 kind: Service
 metadata:
   name: hello-world
   labels:
-    run: hello-world
+    app: hello-world
 spec:
   ports:
-  - port: 8000
-    protocol: TCP
+    - name: http
+      port: 80
+      targetPort: 8000
   selector:
-    run: hello-world
-  type: NodePort
+    app: hello-world

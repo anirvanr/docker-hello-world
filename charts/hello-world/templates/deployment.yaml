@@ -1,19 +1,23 @@
-apiVersion: apps/v1beta2
+apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: hello-world
+  labels:
+    app: hello-world
 spec:
-  selector:
-    matchLabels:
-      run: hello-world
   replicas: 1
   template:
     metadata:
       labels:
-        run: hello-world
+        app: hello-world
     spec:
+      imagePullSecrets:
+        - name: dk.dynacommercelab.com
       containers:
-      - name: hello-world
-        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
-        ports:
-        - containerPort: 8000
+        - name: hello-world
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+              name: http
