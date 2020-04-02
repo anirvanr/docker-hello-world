@@ -12,7 +12,7 @@ pipeline {
 
   environment {
     container_name = "hello-world"
-    nexus_url = "https://dk.dynacommercelab.com"
+    nexus_url = "dk.dynacommercelab.com"
     nexus_creds_id = "nexus-credentials"
     docker_image = "dk.dynacommercelab.com/${container_name}"
     build_tag = "1.0.3"
@@ -34,7 +34,7 @@ pipeline {
     stage('Dockerize') {
       steps {
         echo 'Dockerizing...'
-          withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "${nexus_url}" ]){
+          withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "https://${nexus_url}" ]){
           sh '''
           if [[ ${BRANCH_NAME} =~ master ]]
           then
@@ -57,7 +57,7 @@ pipeline {
           expression { BRANCH_NAME ==~ /develop/ }
         }
         steps {
-          withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "${nexus_url}" ]){
+          withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "https://${nexus_url}" ]){
           sh '''
           IMAGE_HASH="$(docker pull ${docker_image} | grep 'Digest: ' | sed 's/Digest: //')"
           /usr/local/bin/kubectl --namespace=development set image deployment/${container_name} ${container_name}=${docker_image}@${IMAGE_HASH} --record
@@ -70,7 +70,7 @@ pipeline {
           expression { BRANCH_NAME ==~ /master/ }
         }
         steps {
-          withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "${nexus_url}" ]){
+          withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "https://${nexus_url}" ]){
           sh '''
           echo ${kubectlTest}
           IMAGE_HASH="$(docker pull $docker_image:${build_tag} | grep 'Digest: ' | sed 's/Digest: //')"
