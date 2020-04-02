@@ -97,7 +97,7 @@ pipeline {
       steps{
         script {
           if ( env.BRANCH_NAME == "develop" ){
-            deployEnv = "staging"
+            deployEnv = "development"
           } else if ( env.BRANCH_NAME == "master" ){
             deployEnv = "production"
           } else{
