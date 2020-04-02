@@ -1,5 +1,4 @@
 apiVersion: v1
-appVersion: "lastest"
 description: A Helm chart for K8S
 name: hello-world
 version: 0.3.0
