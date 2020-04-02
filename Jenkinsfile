@@ -17,17 +17,17 @@ pipeline {
     DOCKER_IMAGE = "dk.dynacommercelab.com/${NAME}"
     TAG = "1.0.3"
     }
-  
-  stage('read') {
-      steps {
-          script {
-              def data = readFile(file: 'config.json')
-              println(data)
-          }
-      }
-    }
+
 
   stages {
+    stage('read') {
+        steps {
+            script {
+                def data = readFile(file: 'config.json')
+                println(data)
+            }
+        }
+      }
     stage('Dockerize') {
       steps {
         echo 'Dockerizing...'
