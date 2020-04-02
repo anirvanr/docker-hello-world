@@ -50,23 +50,42 @@ pipeline {
           }
         }
       }
+    // stage('Dockerize') {
+    //   steps {
+    //     echo 'Dockerizing...'
+    //       withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "https://${nexus_url}" ]){
+    //       sh '''
+    //       if [[ ${BRANCH_NAME} =~ master ]]
+    //       then
+    //         docker build -f "Dockerfile" -t ${docker_image}:${build_tag} .
+    //         docker push ${docker_image}:${build_tag} || { >&2 echo "Failed to push build_tag '${build_tag}' image ${docker_image}"; exit 1; }
+    //       elif [[ ${BRANCH_NAME} =~ develop ]]
+    //       then
+    //         docker build -f "Dockerfile" -t ${docker_image}:latest .
+    //         docker push ${docker_image} || { >&2 echo "Failed to push build_tag 'latest' image ${docker_image}"; exit 1; }
+    //       else
+    //         echo 'Do that only on master or develop branch'
+    //       fi
+    //       '''
+    //     }
+    //   }
+    // }
     stage('Dockerize') {
       steps {
         echo 'Dockerizing...'
           withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "https://${nexus_url}" ]){
-          sh '''
-          if [[ ${BRANCH_NAME} =~ master ]]
-          then
-            docker build -f "Dockerfile" -t ${docker_image}:${build_tag} .
-            docker push ${docker_image}:${build_tag} || { >&2 echo "Failed to push build_tag '${build_tag}' image ${docker_image}"; exit 1; }
-          elif [[ ${BRANCH_NAME} =~ develop ]]
-          then
-            docker build -f "Dockerfile" -t ${docker_image}:latest .
-            docker push ${docker_image} || { >&2 echo "Failed to push build_tag 'latest' image ${docker_image}"; exit 1; }
-          else
-            echo 'Do that only on master or develop branch'
-          fi
-          '''
+          script {
+            if ( env.BRANCH_NAME == "develop" ){
+              deployEnv = "staging"
+              docker build -f "Dockerfile" -t ${docker_image}:latest .
+            } else if ( env.BRANCH_NAME == "master" ){
+              deployEnv = "production"
+              docker build -f "Dockerfile" -t ${docker_image}:${build_tag} .
+            } else{
+              deployEnv = "none"
+              error "Building unknown branch"
+            }
+          }
         }
       }
     }
@@ -81,19 +100,19 @@ pipeline {
             deployEnv = "none"
             error "Building unknown branch"
           }
-        def pwd = pwd()
-        def app_name = "${container_name}"
-        def chart_dir = "${pwd}/charts/${container_name}"
-        // run helm chart linter
-        helmLint(chart_dir)
-        kubectlTest()
-        helmDeploy(
-        dry_run       : true,
-        name          : app_name,
-        chart_dir     : chart_dir,
-        tag           : build_tag,
-        namespace     : deployEnv
-        )
+          def pwd = pwd()
+          def app_name = "${container_name}"
+          def chart_dir = "${pwd}/charts/${container_name}"
+          // run helm chart linter
+          helmLint(chart_dir)
+          kubectlTest()
+          helmDeploy(
+          dry_run       : true,
+          name          : app_name,
+          chart_dir     : chart_dir,
+          tag           : build_tag,
+          namespace     : deployEnv
+          )
         }
       }
     }
