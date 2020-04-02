@@ -10,7 +10,7 @@
     def inputFile = readFile('config.json')
     def config = new groovy.json.JsonSlurperClassic().parseText(inputFile)
     println "pipeline config ==> ${config}"
-    
+
 pipeline {
   agent any
 
@@ -42,20 +42,6 @@ pipeline {
           '''
         }
       }
-    }
-    stage ('helm test') {
-        
-    // run helm chart linter
-      helmLint(chart_dir)
-
-    // run dry-run helm chart installation
-      helmDeploy(
-        dry_run       : true,
-        name          : config.app.name,
-        chart_dir     : chart_dir,
-        tag           : build_tag,
-      )
-
     }
 
     stage('Deploy development') {
