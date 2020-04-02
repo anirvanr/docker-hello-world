@@ -33,7 +33,7 @@ pipeline {
     nexus_url = "dk.dynacommercelab.com"
     nexus_creds_id = "nexus-credentials"
     docker_image = "${nexus_url}/${container_name}"
-    build_tag = "1.0.3"
+    build_tag = 1.0.3
     }
   stages {
     stage('read') {
