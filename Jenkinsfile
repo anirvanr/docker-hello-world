@@ -8,9 +8,9 @@ def kubectlTest() {
     sh "/usr/local/bin/kubectl get nodes"
 }
 
-def helmLint(String chart_dir) {
+def helmLint(String chart_dir, String deployEnv) {
     // lint helm chart
-    sh "/usr/local/bin/helm lint ${chart_dir} -f ${chart_dir}/$deployEnv-values.yaml"
+    sh "/usr/local/bin/helm lint ${chart_dir} -f ${chart_dir}/${deployEnv}-values.yaml"
 }
 
 def helmDeploy(Map args) {
