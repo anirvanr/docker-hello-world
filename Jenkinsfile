@@ -28,9 +28,6 @@ pipeline {
     stage('read') {
         steps {
             script {
-                def pwd = pwd()
-                println(pwd)
-                def chart_dir = "${pwd}/charts/${container_name}"
                 def data = readFile(file: 'config.json')
                 println(data)
                 def inputFile = readFile('config.json')
@@ -41,6 +38,8 @@ pipeline {
       }
         stage ('helm test') {
           steps{
+            def pwd = pwd()
+            def chart_dir = "${pwd}/charts/${container_name}"
             // run helm chart linter
             helmLint(chart_dir)
             }
