@@ -38,12 +38,14 @@ pipeline {
       }
         stage ('helm test') {
           steps{
+                        script {
             def pwd = pwd()
             def chart_dir = "${pwd}/charts/${container_name}"
             // run helm chart linter
             helmLint(chart_dir)
             }
           }
+        }
     stage('Dockerize') {
       steps {
         echo 'Dockerizing...'
