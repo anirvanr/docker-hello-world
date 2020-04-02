@@ -43,13 +43,15 @@ pipeline {
   stages {
     stage("Check out") {
       steps {
-        if ( ${BRANCH_NAME} == "develop" ){
-          deployEnv = "staging"
-        } else if ( ${BRANCH_NAME} == "master" ){
-          deployEnv = "production"
-        } else{
-          deployEnv = "none"
-          error "Building unknown branch"
+        script {
+          if ( ${BRANCH_NAME} == "develop" ){
+            deployEnv = "staging"
+          } else if ( ${BRANCH_NAME} == "master" ){
+            deployEnv = "production"
+          } else{
+            deployEnv = "none"
+            error "Building unknown branch"
+          }
         }
       }
     }
