@@ -33,7 +33,7 @@ pipeline {
     nexus_url = "dk.dynacommercelab.com"
     nexus_creds_id = "nexus-credentials"
     docker_image = "${nexus_url}/${container_name}"
-    build_tag = "1.0.3"
+    tag = "1.0.3"
     }
   stages {
     stage('read') {
@@ -54,7 +54,7 @@ pipeline {
           sh '''
           if [[ ${BRANCH_NAME} =~ master ]]
           then
-            docker build -f "Dockerfile" -t ${docker_image}:${build_tag} .
+            docker build -f "Dockerfile" -t ${docker_image}:${tag} .
             docker push ${docker_image}:${build_tag} || { >&2 echo "Failed to push build_tag '${build_tag}' image ${docker_image}"; exit 1; }
           elif [[ ${BRANCH_NAME} =~ develop ]]
           then
