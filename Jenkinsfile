@@ -44,9 +44,9 @@ pipeline {
     stage("Check out") {
       steps {
         script {
-          if ( ${BRANCH_NAME} == "develop" ){
+          if ( env.BRANCH_NAME == "develop" ){
             deployEnv = "staging"
-          } else if ( ${BRANCH_NAME} == "master" ){
+          } else if ( env.BRANCH_NAME == "master" ){
             deployEnv = "production"
           } else{
             deployEnv = "none"
