@@ -17,10 +17,10 @@ def helmDeploy(Map args) {
     //configure helm client and confirm tiller process is installed
     if (args.dry_run) {
         println "Running dry-run deployment"
-        sh "/usr/local/bin/helm upgrade --dry-run --debug --install ${args.name} ${args.chart_dir} --namespace=${args.namespace}"
+        sh "/usr/local/bin/helm upgrade --dry-run --debug --install ${args.name} ${args.chart_dir} --namespace=${args.env}"
     } else {
         println "Running deployment"
-        sh "/usr/local/bin/helm upgrade --install ${args.name} ${args.chart_dir} -f ${args.namespace}-values.yaml --namespace=${args.namespace}"
+        sh "/usr/local/bin/helm upgrade --install ${args.name}-${args.env} ${args.chart_dir} -f ${args.env}-values.yaml --namespace=${args.env}"
         echo "Application ${args.name} successfully deployed. Use helm status ${args.name} to check"
     }
 }
@@ -112,7 +112,7 @@ pipeline {
           name          : app_name,
           chart_dir     : chart_dir,
           tag           : build_tag,
-          namespace     : deployEnv
+          env           : deployEnv
           )
         }
       }
