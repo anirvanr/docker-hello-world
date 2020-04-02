@@ -41,7 +41,7 @@ pipeline {
     }
 
     stage("Check out") {
-
+      steps {
         if ( ${BRANCH_NAME} =~ master == "develop" ){
           deployEnv = "staging"
         } else if ( ${BRANCH_NAME} == "master" ){
@@ -50,6 +50,7 @@ pipeline {
           deployEnv = "none"
           error "Building unknown branch"
         }
+      }
     }
 
   stages {
