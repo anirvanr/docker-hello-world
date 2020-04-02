@@ -1,6 +1,6 @@
 #!groovy
 
-  def kubectlTest() {
+def kubectlTest() {
     // Test that kubectl can correctly communication with the Kubernetes API
     echo "running kubectl test"
     sh "kubectl get nodes"
@@ -43,6 +43,7 @@ pipeline {
             def chart_dir = "${pwd}/charts/${container_name}"
             // run helm chart linter
             helmLint(chart_dir)
+            kubectlTest()
             }
           }
         }
