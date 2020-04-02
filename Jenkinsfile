@@ -79,7 +79,7 @@ pipeline {
             '''
             } else if ( env.BRANCH_NAME == "master" ){
             sh '''
-              docker build -f "Dockerfile" -t ${docker_image}:${env.build_tag} .
+              docker build -f "Dockerfile" -t ${docker_image}:${build_tag} .
               docker push ${docker_image}:${build_tag} || { >&2 echo "Failed to push build_tag '${build_tag}' image ${docker_image}"; exit 1; }
             '''
             } else{
