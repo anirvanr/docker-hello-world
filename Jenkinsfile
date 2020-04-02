@@ -11,11 +11,11 @@ pipeline {
   agent any
 
   environment {
-    NAME = "hello-world"
-    NEXUS_URL = "https://dk.dynacommercelab.com"
-    NEXUS_CREDENTIAL_ID = "nexus-credentials"
-    DOCKER_IMAGE = "dk.dynacommercelab.com/${NAME}"
-    TAG = "1.0.3"
+    container_name = "hello-world"
+    nexus_url = "https://dk.dynacommercelab.com"
+    nexus_creds_id = "nexus-credentials"
+    docker_image = "dk.dynacommercelab.com/${container_name}"
+    build_tag = "1.0.3"
     }
 
 
@@ -34,16 +34,16 @@ pipeline {
     stage('Dockerize') {
       steps {
         echo 'Dockerizing...'
-          withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL}" ]){
+          withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "${nexus_url}" ]){
           sh '''
           if [[ ${BRANCH_NAME} =~ master ]]
           then
-            docker build -f "Dockerfile" -t ${DOCKER_IMAGE}:${TAG} .
-            docker push ${DOCKER_IMAGE}:${TAG} || { >&2 echo "Failed to push tag '${TAG}' image ${DOCKER_IMAGE}"; exit 1; }
+            docker build -f "Dockerfile" -t ${docker_image}:${build_tag} .
+            docker push ${docker_image}:${build_tag} || { >&2 echo "Failed to push build_tag '${build_tag}' image ${docker_image}"; exit 1; }
           elif [[ ${BRANCH_NAME} =~ develop ]]
           then
-            docker build -f "Dockerfile" -t ${DOCKER_IMAGE}:latest .
-            docker push ${DOCKER_IMAGE} || { >&2 echo "Failed to push tag 'latest' image ${DOCKER_IMAGE}"; exit 1; }
+            docker build -f "Dockerfile" -t ${docker_image}:latest .
+            docker push ${docker_image} || { >&2 echo "Failed to push build_tag 'latest' image ${docker_image}"; exit 1; }
           else
             echo 'Do that only on master or develop branch'
           fi
@@ -57,10 +57,10 @@ pipeline {
           expression { BRANCH_NAME ==~ /develop/ }
         }
         steps {
-          withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL}" ]){
+          withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "${nexus_url}" ]){
           sh '''
-          IMAGE_HASH="$(docker pull ${DOCKER_IMAGE} | grep 'Digest: ' | sed 's/Digest: //')"
-          /usr/local/bin/kubectl --namespace=development set image deployment/${NAME} ${NAME}=${DOCKER_IMAGE}@${IMAGE_HASH} --record
+          IMAGE_HASH="$(docker pull ${docker_image} | grep 'Digest: ' | sed 's/Digest: //')"
+          /usr/local/bin/kubectl --namespace=development set image deployment/${container_name} ${container_name}=${docker_image}@${IMAGE_HASH} --record
           '''
         }
       }
@@ -70,11 +70,11 @@ pipeline {
           expression { BRANCH_NAME ==~ /master/ }
         }
         steps {
-          withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL}" ]){
+          withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "${nexus_url}" ]){
           sh '''
           echo ${kubectlTest}
-          IMAGE_HASH="$(docker pull $DOCKER_IMAGE:${TAG} | grep 'Digest: ' | sed 's/Digest: //')"
-          /usr/local/bin/kubectl --namespace=production set image deployment/${NAME} ${NAME}=${DOCKER_IMAGE}@${IMAGE_HASH} --record
+          IMAGE_HASH="$(docker pull $docker_image:${build_tag} | grep 'Digest: ' | sed 's/Digest: //')"
+          /usr/local/bin/kubectl --namespace=production set image deployment/${container_name} ${container_name}=${docker_image}@${IMAGE_HASH} --record
           '''
         }
       }
@@ -94,7 +94,7 @@ pipeline {
     //     }
     //     environment {
     //       DOCKER_IMAGE_MF = "dkmf.dynacommercelab.com/${NAME}"
-    //       NEXUS_URL_MF = "https://dkmf.dynacommercelab.com"
+    //       nexus_url_MF = "https://dkmf.dynacommercelab.com"
     //     }
     //     steps {
     //       script {
@@ -102,7 +102,7 @@ pipeline {
     //           env.IMAGE_PUSH = input message: 'User input required', ok: 'Continue',
     //           parameters: [choice(name: 'Upload docker image', choices: 'yes\nno', description: '')]
     //           }
-    //       withDockerRegistry([ credentialsId: "${NEXUS_CREDENTIAL_ID}", url: "${NEXUS_URL_MF}" ]){
+    //       withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "${nexus_url_MF}" ]){
     //       sh '''
     //       if [[ ${IMAGE_PUSH} == 'yes' ]]
     //       then
