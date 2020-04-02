@@ -20,7 +20,7 @@ def helmDeploy(Map args) {
         sh "/usr/local/bin/helm upgrade --dry-run --debug --install ${args.name} ${args.chart_dir} --namespace=${args.namespace}"
     } else {
         println "Running deployment"
-        sh "/usr/local/bin/helm upgrade --install --recreate-pods ${args.name} ${args.chart_dir} -f ${args.namespace}-values.yaml --namespace=${args.namespace}"
+        sh "/usr/local/bin/helm upgrade --install ${args.name} ${args.chart_dir} -f ${args.namespace}-values.yaml --namespace=${args.namespace}"
         echo "Application ${args.name} successfully deployed. Use helm status ${args.name} to check"
     }
 }
