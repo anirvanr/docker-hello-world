@@ -23,11 +23,15 @@ pipeline {
     stage('read') {
         steps {
             script {
+                def pwd = pwd()
+                println(pwd)
+                def chart_dir = "${pwd}/charts/${container_name}"
+                println(chart_dir)
                 def data = readFile(file: 'config.json')
                 println(data)
-    def inputFile = readFile('config.json')
-    def config = new groovy.json.JsonSlurperClassic().parseText(inputFile)
-    println "pipeline config ==> ${config}"
+                def inputFile = readFile('config.json')
+                def config = new groovy.json.JsonSlurperClassic().parseText(inputFile)
+                println "pipeline config ==> ${config}"
             }
         }
       }
@@ -36,11 +40,11 @@ pipeline {
         echo 'Dockerizing...'
           withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "https://${nexus_url}" ]){
           sh '''
-          if [[ ${branch_name} =~ master ]]
+          if [[ ${BRANCH_NAME} =~ master ]]
           then
             docker build -f "Dockerfile" -t ${docker_image}:${build_tag} .
             docker push ${docker_image}:${build_tag} || { >&2 echo "Failed to push build_tag '${build_tag}' image ${docker_image}"; exit 1; }
-          elif [[ ${branch_name} =~ develop ]]
+          elif [[ ${BRANCH_NAME} =~ develop ]]
           then
             docker build -f "Dockerfile" -t ${docker_image}:latest .
             docker push ${docker_image} || { >&2 echo "Failed to push build_tag 'latest' image ${docker_image}"; exit 1; }
@@ -54,27 +58,27 @@ pipeline {
 
     stage('Deploy development') {
         when {
-          expression { branch_name ==~ /develop/ }
+          expression { BRANCH_NAME ==~ /develop/ }
         }
         steps {
           withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "https://${nexus_url}" ]){
           sh '''
-          IMAGE_HASH="$(docker pull ${docker_image} | grep 'Digest: ' | sed 's/Digest: //')"
-          /usr/local/bin/kubectl --namespace=development set image deployment/${container_name} ${container_name}=${docker_image}@${IMAGE_HASH} --record
+          docker_image_hash="$(docker pull ${docker_image} | grep 'Digest: ' | sed 's/Digest: //')"
+          /usr/local/bin/kubectl --namespace=development set image deployment/${container_name} ${container_name}=${docker_image}@${docker_image_hash} --record
           '''
         }
       }
     }
     stage('Deploy production') {
         when {
-          expression { branch_name ==~ /master/ }
+          expression { BRANCH_NAME ==~ /master/ }
         }
         steps {
           withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "https://${nexus_url}" ]){
           sh '''
           echo ${kubectlTest}
-          IMAGE_HASH="$(docker pull $docker_image:${build_tag} | grep 'Digest: ' | sed 's/Digest: //')"
-          /usr/local/bin/kubectl --namespace=production set image deployment/${container_name} ${container_name}=${docker_image}@${IMAGE_HASH} --record
+          docker_image_hash="$(docker pull $docker_image:${build_tag} | grep 'Digest: ' | sed 's/Digest: //')"
+          /usr/local/bin/kubectl --namespace=production set image deployment/${container_name} ${container_name}=${docker_image}@${docker_image_hash} --record
           '''
         }
       }
