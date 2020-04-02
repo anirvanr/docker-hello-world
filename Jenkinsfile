@@ -1,5 +1,7 @@
 #!groovy
 
+def deployEnv
+
 def kubectlTest() {
     // Test that kubectl can correctly communication with the Kubernetes API
     echo "running kubectl test"
@@ -12,6 +14,21 @@ def helmLint(String chart_dir) {
 
 }
 
+def helmDeploy(Map args) {
+    //configure helm client and confirm tiller process is installed
+
+    if (args.dry_run) {
+        println "Running dry-run deployment"
+        sh "/usr/local/bin/helm upgrade --dry-run --debug --install ${args.name} ${args.chart_dir} --set ImageTag=${args.tag} --namespace=${args.name}"
+    } else {
+        println "Running deployment"
+        sh "/usr/local/bin/helm upgrade --install ${args.name} ${args.chart_dir} --set ImageTag=${args.tag} --namespace=${args.name}"
+        echo "Application ${args.name} successfully deployed. Use helm status ${args.name} to check"
+    }
+}
+
+
+
 pipeline {
   agent any
 
@@ -23,30 +40,30 @@ pipeline {
     build_tag = "1.0.3"
     }
 
+    stage("Check out") {
+
+        if ( ${BRANCH_NAME} =~ master == "develop" ){
+          deployEnv = "staging"
+        } else if ( ${BRANCH_NAME} == "master" ){
+          deployEnv = "production"
+        } else{
+          deployEnv = "none"
+          error "Building unknown branch"
+        }
+    }
 
   stages {
     stage('read') {
         steps {
-            script {
-                def data = readFile(file: 'config.json')
-                println(data)
-                def inputFile = readFile('config.json')
-                def config = new groovy.json.JsonSlurperClassic().parseText(inputFile)
-                println "pipeline config ==> ${config}"
-            }
-        }
-      }
-        stage ('helm test') {
-          steps{
-                        script {
-            def pwd = pwd()
-            def chart_dir = "${pwd}/charts/${container_name}"
-            // run helm chart linter
-            helmLint(chart_dir)
-            kubectlTest()
-            }
+          script {
+              def data = readFile(file: 'config.json')
+              println(data)
+              def inputFile = readFile('config.json')
+              def config = new groovy.json.JsonSlurperClassic().parseText(inputFile)
+              println "pipeline config ==> ${config}"
           }
         }
+      }
     stage('Dockerize') {
       steps {
         echo 'Dockerizing...'
@@ -67,34 +84,53 @@ pipeline {
         }
       }
     }
+    stage ('helm test') {
+      steps{
+        script {
+        def pwd = pwd()
+        def app_name = ${container_name}
+        def chart_dir = "${pwd}/charts/${container_name}"
+        // run helm chart linter
+        helmLint(chart_dir)
+        kubectlTest()
+        helmDeploy(
+        dry_run       : true,
+        name          : app_name,
+        chart_dir     : chart_dir,
+        tag           : build_tag
+        // namespace     : deployEnv
+        )
+        }
+      }
+    }
 
-    stage('Deploy development') {
-        when {
-          expression { BRANCH_NAME ==~ /develop/ }
-        }
-        steps {
-          withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "https://${nexus_url}" ]){
-          sh '''
-          docker_image_hash="$(docker pull ${docker_image} | grep 'Digest: ' | sed 's/Digest: //')"
-          /usr/local/bin/kubectl --namespace=development set image deployment/${container_name} ${container_name}=${docker_image}@${docker_image_hash} --record
-          '''
-        }
-      }
-    }
-    stage('Deploy production') {
-        when {
-          expression { BRANCH_NAME ==~ /master/ }
-        }
-        steps {
-          withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "https://${nexus_url}" ]){
-          sh '''
-          echo ${kubectlTest}
-          docker_image_hash="$(docker pull $docker_image:${build_tag} | grep 'Digest: ' | sed 's/Digest: //')"
-          /usr/local/bin/kubectl --namespace=production set image deployment/${container_name} ${container_name}=${docker_image}@${docker_image_hash} --record
-          '''
-        }
-      }
-    }
+    // stage('Deploy development') {
+    //     when {
+    //       expression { BRANCH_NAME ==~ /develop/ }
+    //     }
+    //     steps {
+    //       withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "https://${nexus_url}" ]){
+    //       sh '''
+    //       docker_image_hash="$(docker pull ${docker_image} | grep 'Digest: ' | sed 's/Digest: //')"
+    //       /usr/local/bin/kubectl --namespace=development set image deployment/${container_name} ${container_name}=${docker_image}@${docker_image_hash} --record
+    //       '''
+    //     }
+    //   }
+    // }
+    // stage('Deploy production') {
+    //     when {
+    //       expression { BRANCH_NAME ==~ /master/ }
+    //     }
+    //     steps {
+    //       withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "https://${nexus_url}" ]){
+    //       sh '''
+    //       echo ${kubectlTest}
+    //       docker_image_hash="$(docker pull $docker_image:${build_tag} | grep 'Digest: ' | sed 's/Digest: //')"
+    //       /usr/local/bin/kubectl --namespace=production set image deployment/${container_name} ${container_name}=${docker_image}@${docker_image_hash} --record
+    //       '''
+    //     }
+    //   }
+    // }
     // stage('analyze') {
     //       when {
     //       branch 'master'
