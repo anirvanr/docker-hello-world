@@ -34,7 +34,7 @@ pipeline {
     stage('Dockerize') {
       steps {
         echo 'Dockerizing...'
-          withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "https://${nexus_url}" ]){
+          withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "${nexus_url}" ]){
           sh '''
           if [[ ${BRANCH_NAME} =~ master ]]
           then
