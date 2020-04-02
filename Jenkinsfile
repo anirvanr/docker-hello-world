@@ -6,18 +6,15 @@
     sh "kubectl get nodes"
 
 }
-// node {
-//     def inputFile = readFile('config.json')
-//     def config = new groovy.json.JsonSlurperClassic().parseText(inputFile)
-//     println "pipeline config ==> ${config}"
-// }
+node {
+    // def inputFile = readFile('config.json')
+    def projects = readJSON file: "${env.WORKSPACE}\\config.json"
+    // def config = new groovy.json.JsonSlurperClassic().parseText(inputFile)
+    println "pipeline config ==> ${config}"
+}
 
 pipeline {
-  agent any {
-    def inputFile = readFile('config.json')
-    def config = new groovy.json.JsonSlurperClassic().parseText(inputFile)
-    println "pipeline config ==> ${config}"
-  }
+  agent any
 
   environment {
     NAME = "hello-world"
