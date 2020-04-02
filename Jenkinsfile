@@ -105,7 +105,7 @@ pipeline {
           def app_name = "${container_name}"
           def chart_dir = "${pwd}/charts/${container_name}"
           // run helm chart linter
-          helmLint(chart_dir)
+          helmLint(chart_dir,deployEnv)
           kubectlTest()
           helmDeploy(
           dry_run       : false,
