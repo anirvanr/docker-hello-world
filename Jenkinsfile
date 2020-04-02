@@ -25,6 +25,9 @@ pipeline {
             script {
                 def data = readFile(file: 'config.json')
                 println(data)
+    def inputFile = readFile('config.json')
+    def config = new groovy.json.JsonSlurperClassic().parseText(inputFile)
+    println "pipeline config ==> ${config}"
             }
         }
       }
