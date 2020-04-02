@@ -26,12 +26,14 @@ pipeline {
                 def pwd = pwd()
                 println(pwd)
                 def chart_dir = "${pwd}/charts/${container_name}"
-                println(chart_dir)
                 def data = readFile(file: 'config.json')
                 println(data)
                 def inputFile = readFile('config.json')
                 def config = new groovy.json.JsonSlurperClassic().parseText(inputFile)
                 println "pipeline config ==> ${config}"
+                sh '''
+                echo $chart_dir
+                '''
             }
         }
       }
