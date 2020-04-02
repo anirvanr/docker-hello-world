@@ -10,7 +10,7 @@ def kubectlTest() {
 
 def helmLint(String chart_dir) {
     // lint helm chart
-    sh "/usr/local/bin/helm lint ${chart_dir} -f ${chart_dir}/${deployEnv}-values.yaml"
+    sh "/usr/local/bin/helm lint ${chart_dir} -f ${chart_dir}/$deployEnv-values.yaml"
 }
 
 def helmDeploy(Map args) {
@@ -36,17 +36,17 @@ pipeline {
     docker_tag = "1.0.3"
     }
   stages {
-    stage('read') {
-        steps {
-          script {
-              def data = readFile(file: 'config.json')
-              println(data)
-              def inputFile = readFile('config.json')
-              def config = new groovy.json.JsonSlurperClassic().parseText(inputFile)
-              println "pipeline config ==> ${config}"
-          }
-        }
-      }
+    // stage('read') {
+    //     steps {
+    //       script {
+    //           def data = readFile(file: 'config.json')
+    //           println(data)
+    //           def inputFile = readFile('config.json')
+    //           def config = new groovy.json.JsonSlurperClassic().parseText(inputFile)
+    //           println "pipeline config ==> ${config}"
+    //       }
+    //     }
+    //   }
     // stage('Dockerize') {
     //   steps {
     //     echo 'Dockerizing...'
