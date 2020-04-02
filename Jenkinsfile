@@ -4,6 +4,11 @@
     // Test that kubectl can correctly communication with the Kubernetes API
     echo "running kubectl test"
     sh "kubectl get nodes"
+}
+
+def helmLint(String chart_dir) {
+    // lint helm chart
+    sh "/usr/local/bin/helm lint ${chart_dir}"
 
 }
 
@@ -31,12 +36,13 @@ pipeline {
                 def inputFile = readFile('config.json')
                 def config = new groovy.json.JsonSlurperClassic().parseText(inputFile)
                 println "pipeline config ==> ${config}"
-                sh '''
-                echo $chart_dir
-                '''
             }
         }
       }
+        stage ('helm test') {
+            // run helm chart linter
+            helmLint(chart_dir)
+          }
     stage('Dockerize') {
       steps {
         echo 'Dockerizing...'
