@@ -90,7 +90,7 @@ pipeline {
       steps{
         script {
         def pwd = pwd()
-        def app_name = ${container_name}
+        def app_name = "${container_name}"
         def chart_dir = "${pwd}/charts/${container_name}"
         // run helm chart linter
         helmLint(chart_dir)
