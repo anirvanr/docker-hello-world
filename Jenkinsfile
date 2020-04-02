@@ -23,6 +23,10 @@ pipeline {
     TAG = "1.0.3"
     }
   
+    def inputFile = readFile('config.json')
+    def config = new groovy.json.JsonSlurperClassic().parseText(inputFile)
+    println "pipeline config ==> ${config}"
+
   stages {
     stage('Dockerize') {
       steps {
