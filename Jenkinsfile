@@ -16,7 +16,6 @@ def helmLint(String chart_dir) {
 
 def helmDeploy(Map args) {
     //configure helm client and confirm tiller process is installed
-
     if (args.dry_run) {
         println "Running dry-run deployment"
         sh "/usr/local/bin/helm upgrade --dry-run --debug --install ${args.name} ${args.chart_dir} --set ImageTag=${args.tag} --namespace=${args.name}"
@@ -40,21 +39,6 @@ pipeline {
     build_tag = "1.0.3"
     }
 
-  stages {
-    stage("Check out") {
-      steps {
-        script {
-          if ( env.BRANCH_NAME == "develop" ){
-            deployEnv = "staging"
-          } else if ( env.BRANCH_NAME == "master" ){
-            deployEnv = "production"
-          } else{
-            deployEnv = "none"
-            error "Building unknown branch"
-          }
-        }
-      }
-    }
     stage('read') {
         steps {
           script {
@@ -89,6 +73,14 @@ pipeline {
     stage ('helm test') {
       steps{
         script {
+          if ( env.BRANCH_NAME == "develop" ){
+            deployEnv = "staging"
+          } else if ( env.BRANCH_NAME == "master" ){
+            deployEnv = "production"
+          } else{
+            deployEnv = "none"
+            error "Building unknown branch"
+          }
         def pwd = pwd()
         def app_name = "${container_name}"
         def chart_dir = "${pwd}/charts/${container_name}"
@@ -96,11 +88,11 @@ pipeline {
         helmLint(chart_dir)
         kubectlTest()
         helmDeploy(
-        dry_run       : false,
+        dry_run       : true,
         name          : app_name,
         chart_dir     : chart_dir,
-        tag           : build_tag
-        // namespace     : deployEnv
+        tag           : build_tag,
+        namespace     : ${deployEnv}
         )
         }
       }
