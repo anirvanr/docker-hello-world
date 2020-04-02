@@ -6,11 +6,6 @@
     sh "kubectl get nodes"
 
 }
-node {
-    def inputFile = readFile('config.json')
-    def config = new groovy.json.JsonSlurperClassic().parseText(inputFile)
-    println "pipeline config ==> ${config}"
-}
 
 pipeline {
   agent any
@@ -23,7 +18,13 @@ pipeline {
     TAG = "1.0.3"
     }
   
-
+       stage('read') {
+           steps {
+               script {
+                   def data = readFile(file: 'config.json')
+                   println(data)
+               }
+           }
 
   stages {
     stage('Dockerize') {
