@@ -11,6 +11,12 @@ pipeline {
     TAG = "1.0.3"
     }
   
+  def kubectlTest() {
+    // Test that kubectl can correctly communication with the Kubernetes API
+    echo "running kubectl test"
+    sh "kubectl get nodes"
+
+}
   stages {
     stage('Dockerize') {
       steps {
