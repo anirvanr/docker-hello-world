@@ -40,8 +40,10 @@ pipeline {
         }
       }
         stage ('helm test') {
+          steps{
             // run helm chart linter
             helmLint(chart_dir)
+            }
           }
     stage('Dockerize') {
       steps {
