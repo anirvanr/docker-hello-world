@@ -17,11 +17,11 @@ def helmDeploy(Map args) {
     //configure helm client and confirm tiller process is installed
     if (args.dry_run) {
         println "Running dry-run deployment"
-        sh "/usr/local/bin/helm upgrade --dry-run --debug --install ${args.name} ${args.chart_dir} --namespace=${args.env}"
+        sh "/usr/local/bin/helm upgrade --dry-run --debug --install ${args.name}-${args.env} ${args.chart_dir} -f ${args.chart_dir}/${args.env}-values.yaml --namespace=${args.env}"
     } else {
         println "Running deployment"
         sh "/usr/local/bin/helm upgrade --install ${args.name}-${args.env} ${args.chart_dir} -f ${args.chart_dir}/${args.env}-values.yaml --namespace=${args.env}"
-        echo "Application ${args.name} successfully deployed. Use helm status ${args.name} to check"
+        echo "Application ${args.name} successfully deployed in ${args.env}. Use helm status ${args.name} to check"
     }
 }
 
@@ -90,7 +90,7 @@ pipeline {
         }
       }
     }
-    stage ('helm test') {
+    stage ('helm deploy') {
       steps{
         script {
           if ( env.BRANCH_NAME == "develop" ){
@@ -108,7 +108,7 @@ pipeline {
           helmLint(chart_dir,deployEnv)
           kubectlTest()
           helmDeploy(
-          dry_run       : false,
+          dry_run       : true,
           name          : app_name,
           chart_dir     : chart_dir,
           tag           : build_tag,
