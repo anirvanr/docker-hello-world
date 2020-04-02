@@ -36,11 +36,11 @@ pipeline {
         echo 'Dockerizing...'
           withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "https://${nexus_url}" ]){
           sh '''
-          if [[ ${BRANCH_NAME} =~ master ]]
+          if [[ ${branch_name} =~ master ]]
           then
             docker build -f "Dockerfile" -t ${docker_image}:${build_tag} .
             docker push ${docker_image}:${build_tag} || { >&2 echo "Failed to push build_tag '${build_tag}' image ${docker_image}"; exit 1; }
-          elif [[ ${BRANCH_NAME} =~ develop ]]
+          elif [[ ${branch_name} =~ develop ]]
           then
             docker build -f "Dockerfile" -t ${docker_image}:latest .
             docker push ${docker_image} || { >&2 echo "Failed to push build_tag 'latest' image ${docker_image}"; exit 1; }
@@ -54,7 +54,7 @@ pipeline {
 
     stage('Deploy development') {
         when {
-          expression { BRANCH_NAME ==~ /develop/ }
+          expression { branch_name ==~ /develop/ }
         }
         steps {
           withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "https://${nexus_url}" ]){
@@ -67,7 +67,7 @@ pipeline {
     }
     stage('Deploy production') {
         when {
-          expression { BRANCH_NAME ==~ /master/ }
+          expression { branch_name ==~ /master/ }
         }
         steps {
           withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "https://${nexus_url}" ]){
