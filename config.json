@@ -1,8 +1,6 @@
 {
   "app": {
     "name": "newegg-nginx",
-    "replicas": "3",
-    "cpu": "10m",
-    "memory": "128Mi"
+    "ver": "3.0.0"
   }
 }
