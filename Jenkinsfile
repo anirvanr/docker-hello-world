@@ -40,6 +40,7 @@ pipeline {
     build_tag = "1.0.3"
     }
 
+  stages {
     stage("Check out") {
       steps {
         if ( ${BRANCH_NAME} =~ master == "develop" ){
@@ -52,8 +53,6 @@ pipeline {
         }
       }
     }
-
-  stages {
     stage('read') {
         steps {
           script {
