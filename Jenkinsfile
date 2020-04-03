@@ -108,7 +108,7 @@ pipeline {
           helmLint(chart_dir,deployEnv)
           kubectlTest()
           helmDeploy(
-          dry_run       : true,
+          dry_run       : false,
           name          : app_name,
           chart_dir     : chart_dir,
           tag           : build_tag,
