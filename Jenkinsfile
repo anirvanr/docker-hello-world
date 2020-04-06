@@ -117,12 +117,10 @@ pipeline {
         }
       }
     }
-    stages {
-        stage('Slack it'){
-            steps {
-                slackSend channel: '#jenkins-ci', 
-                          message: 'Hello, world'
-            }
+    stage('Slack it'){
+        steps {
+            slackSend channel: '#jenkins-ci', 
+                      message: 'Hello, world'
         }
     }
     // stage('Deploy development') {
