@@ -75,7 +75,7 @@ pipeline {
             if ( env.BRANCH_NAME == "develop" ){
             sh '''
               docker build -f "Dockerfile" -t ${docker_image}:latest .
-              docker push ${docker_image} || { >&2 echo "Failed to push build_tag 'latest' image ${docker_image}"; exit 1; }
+              docker push ${docker_image}:4.2.0 || { >&2 echo "Failed to push build_tag 'latest' image ${docker_image}"; exit 1; }
             '''
             } else if ( env.BRANCH_NAME == "master" ){
             sh '''
