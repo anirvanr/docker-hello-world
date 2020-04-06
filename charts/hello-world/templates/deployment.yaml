@@ -4,8 +4,6 @@ metadata:
   name: hello-world
   labels:
     app: hello-world
-  annotations:
-    timestamp: "{{ .Values.timestamp }}"
 spec:
   replicas: 1
   template:
