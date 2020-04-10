@@ -5,22 +5,22 @@ def versions
 
 node {  
   sh "/usr/local/bin/helm repo update chartmuseum"
-  chartname = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}'", returnStdout: true).trim()
+  chartname = sh (script: "/usr/local/bin/helm search chartmuseum | awk '{if (NR!=1) {print \$1}}'", returnStdout: true).trim()
 }
 
 pipeline {
   agent any
 
   parameters {
-          choice(name: 'Invoke_Parameters', choices:"Yes\nNo", description: "Do you whish to do a dry?" )
-          choice(name: 'charts', choices:"${chartname}", description: "")
+          choice(name: 'dry_run', choices:"Yes\nNo", description: "Do you whish to do a dry?" )
+          choice(name: 'charts', choices:"${chartname}", description: "Which Chart do you want to deploy?")
   }
 
 stages {
   stage("parameterizing") {
     steps {
         script {
-          if ("${params.Invoke_Parameters}" == "Yes") {
+          if ("${params.dry_run}" == "Yes") {
           currentBuild.result = 'ABORTED'
           error('DRY RUN COMPLETED. JOB PARAMETERIZED.')
         }
