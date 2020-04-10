@@ -5,7 +5,7 @@ def versions
 
 node {  
   sh "/usr/local/bin/helm repo update chartmuseum"
-  chartname = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}'", returnStdout: false).trim()
+  chartname = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}'", returnStdout: true).trim()
 }
 
 pipeline {
@@ -22,7 +22,6 @@ stages {
         script {
           if ("${params.dry_run}" == "Yes") {
           currentBuild.result = 'ABORTED'
-          error('DRY RUN COMPLETED. JOB PARAMETERIZED.')
         }
       }
     }
