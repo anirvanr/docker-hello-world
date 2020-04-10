@@ -4,17 +4,29 @@ def charts
 def versions
 
 node {
-  list_charts = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}'", returnStdout: true).trim()
+  all_charts = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}'", returnStdout: true).trim()
 }
 
 pipeline {
   agent any
 
     parameters {
-            choice(name: 'charts', choices:"${list_charts}", description: "")
+            choice(name: 'Invoke_Parameters', choices:"Yes\nNo", description: "Do you whish to do a dry?" )
+            choice(name: 'charts', choices:"${all_charts}", description: "")
     }
 
 stages {
+  stages {
+    stage("parameterizing") {
+      steps {
+          script {
+            if ("${params.Invoke_Parameters}" == "Yes") {
+            currentBuild.result = 'ABORTED'
+            error('DRY RUN COMPLETED. JOB PARAMETERIZED.')
+          }
+        }
+      }
+    }
   stage("choose version") {
     steps {
         script {
