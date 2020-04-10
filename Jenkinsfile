@@ -16,17 +16,16 @@ pipeline {
     }
 
 stages {
-  stages {
-    stage("parameterizing") {
-      steps {
-          script {
-            if ("${params.Invoke_Parameters}" == "Yes") {
-            currentBuild.result = 'ABORTED'
-            error('DRY RUN COMPLETED. JOB PARAMETERIZED.')
-          }
+  stage("parameterizing") {
+    steps {
+        script {
+          if ("${params.Invoke_Parameters}" == "Yes") {
+          currentBuild.result = 'ABORTED'
+          error('DRY RUN COMPLETED. JOB PARAMETERIZED.')
         }
       }
     }
+  }
   stage("choose version") {
     steps {
         script {
