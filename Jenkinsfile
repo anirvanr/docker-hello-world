@@ -34,7 +34,7 @@ def helmDeploy(Map args) {
 }
 
 pipeline {
-  agent { node { label 'any' } }
+  agent { node { label 'linux' } }
   // agent {
   //       node {
   //         label 'any'
