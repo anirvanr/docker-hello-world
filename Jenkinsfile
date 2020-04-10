@@ -188,27 +188,27 @@ pipeline {
     //   }
     // }
   }
-  post {
-        always {
+  // post {
+  //       always {
 
-            echo 'slack notification....'
-            script {
-                if (BRANCH_NAME.startsWith('PR')) {
-                    env.channel = '#jenkins-ci'
-                } else {
-                    env.channel = '#jenkins-ci'
-                }
-            }
-        }
+  //           echo 'slack notification....'
+  //           script {
+  //               if (BRANCH_NAME.startsWith('PR')) {
+  //                   env.channel = '#jenkins-ci'
+  //               } else {
+  //                   env.channel = '#jenkins-ci'
+  //               }
+  //           }
+  //       }
 
-        failure {
-            echo 'Failure!'
-            slackSend channel: env.channel, color: "danger", message: "Build Failed: <${env.JOB_DISPLAY_URL}|${env.JOB_NAME}> <${env.RUN_DISPLAY_URL}|#${env.BUILD_NUMBER}>"
-        }
+  //       failure {
+  //           echo 'Failure!'
+  //           slackSend channel: env.channel, color: "danger", message: "Build Failed: <${env.JOB_DISPLAY_URL}|${env.JOB_NAME}> <${env.RUN_DISPLAY_URL}|#${env.BUILD_NUMBER}>"
+  //       }
 
-        success {
-            echo 'Success!'
-            slackSend channel: env.channel, color: "good", message: "Build Passed: <${env.JOB_DISPLAY_URL}|${env.JOB_NAME}> <${env.RUN_DISPLAY_URL}|#${env.BUILD_NUMBER}>"
-        }
-    }
+  //       success {
+  //           echo 'Success!'
+  //           slackSend channel: env.channel, color: "good", message: "Build Passed: <${env.JOB_DISPLAY_URL}|${env.JOB_NAME}> <${env.RUN_DISPLAY_URL}|#${env.BUILD_NUMBER}>"
+  //       }
+  //   }
 }
