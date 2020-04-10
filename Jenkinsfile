@@ -81,7 +81,7 @@ pipeline {
             else
                 echo "helm push plugin already exists, skipping..."
             fi
-        /usr/local/bin/helm push --context-path=/techm/megafon ${pwd}/charts/${container_name} chartmuseum --username ${helm_user} --password ${helm_pass}
+        /usr/local/bin/helm push --context-path=/techm/megafon "${env.WORKSPACE}"/charts/${container_name} chartmuseum --username ${helm_user} --password ${helm_pass}
         '''
         }
       }
