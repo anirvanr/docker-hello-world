@@ -34,6 +34,7 @@ pipeline {
     nexus_creds_id = "nexus-credentials"
     docker_image = "${nexus_url}/${container_name}"
     docker_tag = "1.0.3"
+    helm_repo_cred = credentials('helm-repo-creds')
     }
   stages {
     // stage('read') {
@@ -67,6 +68,16 @@ pipeline {
     //     }
     //   }
     // }
+    stage ('helm push') {
+      steps{
+        sh '''
+        helm init --client-only
+        helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon
+        helm plugin install https://github.com/chartmuseum/helm-push.git
+        helm push --context-path=/techm/megafon ${args.chart_dir} chartmuseum --username ${helm_repo_cred_usr} --password ${helm_repo_cred_psw}
+        '''
+      }
+    }
     stage('Dockerize') {
       steps {
         echo 'Dockerizing...'
