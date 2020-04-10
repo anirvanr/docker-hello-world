@@ -34,6 +34,7 @@ def helmDeploy(Map args) {
 }
 
 def charts
+def versions
 
 node {
   // sh """
@@ -90,27 +91,27 @@ stages {
       }
     }
   }              
-  stage('Manual Deployment'){
-  when { expression { BRANCH_NAME ==~ /develop/ } }
-  steps{
-      script {
-          if (params.version) { env.addVersion = "--version ${params.version}" }
-          else { env.addVersion = ' '}
-          if (params.values) { env.addValues = "--set-string ${params.values}"}
-          else { env.addValues = ' '  }
-          switch(params.chartname) {
-              case 'dev':
-                  env.namespace = "--namespace development";
-              break;
-              default:
-                  env.namespace = '--namespace default';
-          }
-      }      
-      sh """
-      /usr/local/bin/helm repo update
-      /usr/local/bin/helm --install canary-${params.chartname} --atomic --wait --timeout 20s ${env.addVersion} ${env.addValues} ${env.namespace} --debug incubator/${params.chartname}
-      """
-      }
-    }
+  // stage('Manual Deployment'){
+  // when { expression { BRANCH_NAME ==~ /develop/ } }
+  // steps{
+  //     script {
+  //         if (params.version) { env.addVersion = "--version ${params.version}" }
+  //         else { env.addVersion = ' '}
+  //         if (params.values) { env.addValues = "--set-string ${params.values}"}
+  //         else { env.addValues = ' '  }
+  //         switch(params.chartname) {
+  //             case 'dev':
+  //                 env.namespace = "--namespace development";
+  //             break;
+  //             default:
+  //                 env.namespace = '--namespace default';
+  //         }
+  //     }      
+  //     sh """
+  //     /usr/local/bin/helm repo update
+  //     /usr/local/bin/helm --install canary-${params.chartname} --atomic --wait --timeout 20s ${env.addVersion} ${env.addValues} ${env.namespace} --debug incubator/${params.chartname}
+  //     """
+  //     }
+  //   }
   }
 }
