@@ -140,10 +140,10 @@ pipeline {
           }
       }
       
-      // sh """
-      // helm repo update
-      // helm upgrade --install canary-${params.chartname} --atomic --wait --timeout 20s ${env.addVersion} ${env.addValues} ${env.namespace} --debug incubator/${params.chartname}
-      // """
+      sh """
+      helm repo update
+      helm upgrade --install canary-${params.chartname} --atomic --wait --timeout 20s ${env.addVersion} ${env.addValues} ${env.namespace} --debug incubator/${params.chartname}
+      """
     }
   }
     // stage('Deploy development') {
