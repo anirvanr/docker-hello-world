@@ -74,7 +74,13 @@ pipeline {
         sh '''
         /usr/local/bin/helm init --client-only
         /usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon
-        /usr/local/bin/helm plugin install https://github.com/chartmuseum/helm-push.git
+        /usr/local/bin/helm plugin list | grep push
+            if [ [ $? -eq 1 ] ]; then
+                echo "helm push plugin not found, installing ..."
+                /usr/local/bin/helm plugin install https://github.com/chartmuseum/helm-push.git --version 0.8.1
+            else
+                echo "helm push plugin already exists, skipping..."
+            fi
         /usr/local/bin/helm push --context-path=/techm/megafon ${chart_dir} chartmuseum --username ${helm_user} --password ${helm_pass}
         '''
         }
