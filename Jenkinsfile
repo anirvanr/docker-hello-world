@@ -47,8 +47,7 @@ stages {
   stage("view values") {
     steps {
       script{
-        def chosen_chart = "${params.charts}"
-        sh "/usr/local/bin/helm fetch $chosen_chart --untar --untardir /tmp/charts --version "${versions}" && cat /tmp/charts/hello-world/"${params.namespace}"-values.yaml"
+        sh "/usr/local/bin/helm fetch "${params.charts}" --untar --untardir /tmp/charts --version $versions && cat /tmp/charts/hello-world/"${params.namespace}"-values.yaml"
         }
       }
     }            
