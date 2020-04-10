@@ -40,7 +40,7 @@ node {
   // /usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}' | awk -F / '{print \$2}' > commandResult
   // """
   // charts = readFile('commandResult').trim()
-  charts = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}' | awk -F / '{print \$2}'", returnStdout: true).trim()
+  charts = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}'", returnStdout: true).trim()
 }
 
 pipeline {
@@ -66,18 +66,32 @@ pipeline {
         description: 'Which Chart do you want to build?',
         choices: "${charts}"
     )
-    string(
-        name: 'version',
-        description: 'Chart Version to deploy?',
-        defaultValue: '0.1.0'
-    )
-    string(
-        name: 'values',
-        description: 'Any values to overwrite?',
-        defaultValue: 'key1=val1,key2=val2'
-    )
+    // string(
+    //     name: 'version',
+    //     description: 'Chart Version to deploy?',
+    //     defaultValue: '0.1.0'
+    // )
+    // string(
+    //     name: 'values',
+    //     description: 'Any values to overwrite?',
+    //     defaultValue: 'key1=val1,key2=val2'
+    // )
   }
-stages { 
+
+stages {
+
+  stage("choose version") {
+            steps {
+                script {
+                    def version_collection
+                    def chosen_chart = "${params.charts}"
+                    dir('/home/pencillr/workspace') {
+                        version_collection = sh (script: "helm search $chosen_chart | awk '{if (NR!=1) {print \$2}}'", returnStdout: true).trim()
+                    }
+                        versions = input message: 'Choose testload version!', ok: 'SET', parameters: [choice(name: 'Chart Version to deploy', choices: "${version_collection}", description: '')]
+                }
+              }
+  }              
   stage('Manual Deployment'){
   when { expression { BRANCH_NAME ==~ /develop/ } }
   steps{
