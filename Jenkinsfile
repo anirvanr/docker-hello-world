@@ -81,16 +81,14 @@ pipeline {
 stages {
 
   stage("choose version") {
-            steps {
-                script {
-                    def version_collection
-                    def chosen_chart = "${params.charts}"
-                    dir('/home/pencillr/workspace') {
-                        version_collection = sh (script: "helm search $chosen_chart | awk '{if (NR!=1) {print \$2}}'", returnStdout: true).trim()
-                    }
-                        versions = input message: 'Choose testload version!', ok: 'SET', parameters: [choice(name: 'Chart Version to deploy', choices: "${version_collection}", description: '')]
-                }
-              }
+    steps {
+        script {
+          def version_collection
+          def chosen_chart = "${params.charts}"
+          version_collection = sh (script: "helm search $chosen_chart | awk '{if (NR!=1) {print \$2}}'", returnStdout: true).trim()
+          versions = input message: 'Choose testload version!', ok: 'SET', parameters: [choice(name: 'Chart Version to deploy', choices: "${version_collection}", description: '')]
+      }
+    }
   }              
   stage('Manual Deployment'){
   when { expression { BRANCH_NAME ==~ /develop/ } }
