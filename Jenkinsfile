@@ -72,10 +72,10 @@ pipeline {
       steps{
         withCredentials([usernamePassword(credentialsId: 'helm-repo-creds', passwordVariable: 'pass', usernameVariable: 'user')]) {
         sh '''
-        helm init --client-only
-        helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon
-        helm plugin install https://github.com/chartmuseum/helm-push.git
-        helm push --context-path=/techm/megafon ${args.chart_dir} chartmuseum --username $user --password $pass
+        /usr/local/bin/helm init --client-only
+        /usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon
+        /usr/local/bin/helm plugin install https://github.com/chartmuseum/helm-push.git
+        /usr/local/bin/helm push --context-path=/techm/megafon ${args.chart_dir} chartmuseum --username $user --password $pass
         '''
         }
       }
