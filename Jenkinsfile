@@ -2,6 +2,7 @@
 
 def charts
 def versions
+def namespace
 
 node {  
   sh "/usr/local/bin/helm repo update chartmuseum"
@@ -48,7 +49,7 @@ stages {
     steps {
       script{
         def chosen_chart = "${params.charts}"
-        sh "/usr/local/bin/helm fetch $chosen_chart --untar --untardir /tmp/charts --version $versions && cat /tmp/charts/hello-world/"${params.namespace}"-values.yaml"
+        sh "/usr/local/bin/helm fetch $chosen_chart --untar --untardir /tmp/charts --version $versions && cat /tmp/charts/hello-world/$namespace-values.yaml"
         }
       }
     }            
