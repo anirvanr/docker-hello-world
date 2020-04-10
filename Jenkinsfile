@@ -36,6 +36,11 @@ def helmDeploy(Map args) {
 pipeline {
   agent any
 
+  options {
+    timeout(time: 15, unit: 'MINUTES')
+    buildDiscarder(logRotator(numToKeepStr: '10'))
+  }
+
   environment {
     container_name = "hello-world"
     nexus_url = "dk.dynacommercelab.com"
@@ -43,7 +48,8 @@ pipeline {
     docker_image = "${nexus_url}/${container_name}"
     docker_tag = "1.0.3"
     // helm_repo_cred = credentials('helm-repo-creds')
-    }
+  }
+  
   stages {
     // stage('read') {
     //     steps {
