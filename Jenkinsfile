@@ -137,12 +137,12 @@ pipeline {
           kubectlTest()
           helmPush(chart_dir)
           helmDeploy(
-          dry_run       : false,
-          name          : app_name,
-          chart_dir     : chart_dir,
-          tag           : build_tag,
-          env           : deployEnv
-          )
+            dry_run     : false,
+            name        : app_name,
+            chart_dir   : chart_dir,
+            tag         : build_tag,
+            env         : deployEnv
+            )
           }
         }
       }
