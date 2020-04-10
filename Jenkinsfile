@@ -49,57 +49,26 @@ pipeline {
     docker_tag = "1.0.3"
     // helm_repo_cred = credentials('helm-repo-creds')
   }
-  
+
+  parameters {
+    choice(
+        name: 'chartname',
+        description: 'Which Chart do you want to build?',
+        choices: 'dev\nhello-world'
+    )
+    string(
+        name: 'version',
+        description: 'Chart Version to deploy?',
+        defaultValue: '0.1.0'
+    )
+    string(
+        name: 'values',
+        description: 'Any values to overwrite?',
+        defaultValue: 'env.open.key1=val1,key2=val2'
+    )
+  }
+
   stages {
-    // stage('read') {
-    //     steps {
-    //       script {
-    //           def data = readFile(file: 'config.json')
-    //           println(data)
-    //           def inputFile = readFile('config.json')
-    //           def config = new groovy.json.JsonSlurperClassic().parseText(inputFile)
-    //           println "pipeline config ==> ${config}"
-    //       }
-    //     }
-    //   }
-    // stage('Dockerize') {
-    //   steps {
-    //     echo 'Dockerizing...'
-    //       withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "https://${nexus_url}" ]){
-    //       sh '''
-    //       if [[ ${BRANCH_NAME} =~ master ]]
-    //       then
-    //         docker build -f "Dockerfile" -t ${docker_image}:${docker_tag} .
-    //         docker push ${docker_image}:${docker_tag} || { >&2 echo "Failed to push build_tag '${docker_tag}' image ${docker_image}"; exit 1; }
-    //       elif [[ ${BRANCH_NAME} =~ develop ]]
-    //       then
-    //         docker build -f "Dockerfile" -t ${docker_image}:latest .
-    //         docker push ${docker_image} || { >&2 echo "Failed to push build_tag 'latest' image ${docker_image}"; exit 1; }
-    //       else
-    //         echo 'Do that only on master or develop branch'
-    //       fi
-    //       '''
-    //     }
-    //   }
-    // }
-    // stage ('helm push') {
-    //   steps{
-    //     withCredentials([usernamePassword(credentialsId: 'helm-repo-creds', passwordVariable: 'helm_pass', usernameVariable: 'helm_user')]) {
-    //     sh '''
-    //     /usr/local/bin/helm init --client-only
-    //     /usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon
-    //     /usr/local/bin/helm plugin list | grep push
-    //         if [ [ $? -eq 1 ] ]; then
-    //             echo "helm push plugin not found, installing ..."
-    //             /usr/local/bin/helm plugin install https://github.com/chartmuseum/helm-push.git
-    //         else
-    //             echo "helm push plugin already exists, skipping..."
-    //         fi
-    //     /usr/local/bin/helm push --context-path=/techm/megafon ${PWD}/charts/${container_name} chartmuseum --username ${helm_user} --password ${helm_pass}
-    //     '''
-    //     }
-    //   }
-    // }
     stage('Dockerize') {
       steps {
         echo 'Dockerizing...'
@@ -153,12 +122,30 @@ pipeline {
         }
       }
     }
-    // stage('Slack it'){
-    //     steps {
-    //         slackSend channel: '#jenkins-ci', 
-    //                   message: 'Hello, world'
-    //     }
-    // }
+
+  stage('Manual Deployment'){
+  when { expression { BRANCH_NAME ==~ /develop/ } }
+  steps{
+      script {
+          if (params.version) { env.addVersion = "--version ${params.version}" }
+          else { env.addVersion = ' '}
+          if (params.values) { env.addValues = "--set-string ${params.values}"}
+          else { env.addValues = ' '  }
+          switch(params.chartname) {
+              case 'dev':
+                  env.namespace = "--namespace development";
+              break;
+              default:
+                  env.namespace = '--namespace default';
+          }
+      }
+      
+      // sh """
+      // helm repo update
+      // helm upgrade --install canary-${params.chartname} --atomic --wait --timeout 20s ${env.addVersion} ${env.addValues} ${env.namespace} --debug incubator/${params.chartname}
+      // """
+    }
+  }
     // stage('Deploy development') {
     //     when {
     //       expression { BRANCH_NAME ==~ /develop/ }
