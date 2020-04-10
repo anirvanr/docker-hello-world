@@ -33,16 +33,23 @@ stages {
           def version_collection
           def chosen_chart = "${params.charts}"
           version_collection = sh (script: "/usr/local/bin/helm search --versions $chosen_chart | awk '{if (NR!=1) {print \$2}}'", returnStdout: true).trim()
-          versions = input message: 'Choose version!', parameters: [choice(name: 'Chart Version to deploy', choices: "${version_collection}", description: '')]
+          versions = input message: 'Choose version!', parameters: [choice(name: 'version', choices: "${version_collection}", description: '')]
         }   
       }
     }
   stage("choose env") {
     steps {
       script{
-        namespace = input message: 'Choose namespace!', parameters: [choice(name: 'Chart Version to deploy', choices: "development\nproduction", description: '')]
+        namespace = input message: 'Choose namespace!', parameters: [choice(name: 'namespace', choices: "development\nproduction", description: '')]
         }
       }
-    }              
+    }
+  stage("view values") {
+    steps {
+      script{
+        sh "/usr/local/bin/helm fetch "${params.charts}" --untar --untardir /tmp/charts --version "${params.version}" && cat /tmp/charts/hello-world/"${params.namespace}"-values.yaml"
+        }
+      }
+    }            
   }
 }
