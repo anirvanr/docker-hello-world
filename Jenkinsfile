@@ -16,7 +16,17 @@ pipeline {
     }
 
 stages {
-
+  stages {
+    stage("parameterizing") {
+        steps {
+            script {
+                if ("${params.Invoke_Parameters}" == "Yes") {
+                    currentBuild.result = 'ABORTED'
+                    error('DRY RUN COMPLETED. JOB PARAMETERIZED.')
+                }
+            }
+        }
+    }
   stage("choose version") {
     steps {
         script {
@@ -24,30 +34,8 @@ stages {
           def chosen_chart = "${params.charts}"
           version_collection = sh (script: "/usr/local/bin/helm search -l $chosen_chart | awk '{if (NR!=1) {print \$2}}'", returnStdout: true).trim()
           versions = input message: 'Choose version!', ok: 'SET', parameters: [choice(name: 'Chart Version to deploy', choices: "${version_collection}", description: '')]
+        }
       }
-    }
-  }              
-  // stage('Manual Deployment'){
-  // when { expression { BRANCH_NAME ==~ /develop/ } }
-  // steps{
-  //     script {
-  //         if (params.version) { env.addVersion = "--version ${params.version}" }
-  //         else { env.addVersion = ' '}
-  //         if (params.values) { env.addValues = "--set-string ${params.values}"}
-  //         else { env.addValues = ' '  }
-  //         switch(params.chartname) {
-  //             case 'dev':
-  //                 env.namespace = "--namespace development";
-  //             break;
-  //             default:
-  //                 env.namespace = '--namespace default';
-  //         }
-  //     }      
-  //     sh """
-  //     /usr/local/bin/helm repo update
-  //     /usr/local/bin/helm --install canary-${params.chartname} --atomic --wait --timeout 20s ${env.addVersion} ${env.addValues} ${env.namespace} --debug incubator/${params.chartname}
-  //     """
-  //     }
-  //   }
+    }              
   }
 }
