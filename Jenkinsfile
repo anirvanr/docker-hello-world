@@ -31,9 +31,9 @@ stages {
         script {
           def version_collection
           def chosen_chart = "${params.charts}"
-          version_collection = sh (script: "/usr/local/bin/helm search -l $chosen_chart | awk '{if (NR!=1) {print \$2}}'", returnStdout: true).trim()
-          versions = input message: 'Choose version!', ok: 'SET', parameters: [choice(name: 'Chart Version to deploy', choices: "${version_collection}", description: '')]
         }
+          version_collection = sh (script: "/usr/local/bin/helm search $chosen_chart | awk '{if (NR!=1) {print \$2}}'", returnStdout: true).trim()
+          versions = input message: 'Choose version!', ok: 'SET', parameters: [choice(name: 'Chart Version to deploy', choices: "${version_collection}", description: '')]
       }
     }              
   }
