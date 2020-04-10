@@ -3,7 +3,7 @@
 def charts
 def versions
 
-list {
+node {
   charts = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}'", returnStdout: true).trim()
 }
 
