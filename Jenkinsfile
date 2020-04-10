@@ -34,14 +34,15 @@ def helmDeploy(Map args) {
 }
 
 pipeline {
-  agent {
-        node {
-          label 'any'
-          def pwd = pwd()
-          def app_name = "${container_name}"
-          def chart_dir = "${pwd}/charts/${container_name}"
-    }
-  }
+  agent { node { label 'any' } }
+  // agent {
+  //       node {
+  //         label 'any'
+  //         def pwd = pwd()
+  //         def app_name = "${container_name}"
+  //         def chart_dir = "${pwd}/charts/${container_name}"
+  //   }
+  // }
 
   environment {
     container_name = "hello-world"
