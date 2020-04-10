@@ -36,6 +36,13 @@ stages {
           versions = input message: 'Choose version!', parameters: [choice(name: 'Chart Version to deploy', choices: "${version_collection}", description: '')]
         }   
       }
+    }
+  stage("choose env") {
+    steps {
+      script{
+        namespace = input message: 'Choose namespace!', parameters: [choice(name: 'Chart Version to deploy', choices: "development\nproduction", description: '')]
+        }
+      }
     }              
   }
 }
