@@ -35,14 +35,6 @@ def helmDeploy(Map args) {
 
 pipeline {
   agent { node { label 'linux' } }
-  // agent {
-  //       node {
-  //         label 'any'
-  //         def pwd = pwd()
-  //         def app_name = "${container_name}"
-  //         def chart_dir = "${pwd}/charts/${container_name}"
-  //   }
-  // }
 
   environment {
     container_name = "hello-world"
@@ -137,10 +129,10 @@ pipeline {
             deployEnv = "none"
             error "Building unknown branch"
           }
-          // def pwd = pwd()
-          // def app_name = "${container_name}"
-          // def chart_dir = "${pwd}/charts/${container_name}"
-          // run helm chart linter
+          def pwd = pwd()
+          def app_name = "${container_name}"
+          def chart_dir = "${pwd}/charts/${container_name}"
+          run helm chart linter
           helmLint(chart_dir,deployEnv)
           kubectlTest()
           helmPush(chart_dir)
