@@ -3,21 +3,18 @@
 def charts
 def versions
 
-node {
-  environment {
-    PATH = "/usr/local/bin:$PATH"
-  }
-  sh "helm repo update chartmuseum"
+node {  
+  sh "/usr/local/bin/helm repo update chartmuseum"
   chartname = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}'", returnStdout: true).trim()
 }
 
 pipeline {
   agent any
 
-    parameters {
-            choice(name: 'Invoke_Parameters', choices:"Yes\nNo", description: "Do you whish to do a dry?" )
-            choice(name: 'charts', choices:"${chartname}", description: "")
-    }
+  parameters {
+          choice(name: 'Invoke_Parameters', choices:"Yes\nNo", description: "Do you whish to do a dry?" )
+          choice(name: 'charts', choices:"${chartname}", description: "")
+  }
 
 stages {
   stage("parameterizing") {
