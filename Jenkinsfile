@@ -141,8 +141,8 @@ pipeline {
       }
       
       sh """
-      helm repo update
-      helm upgrade --install canary-${params.chartname} --atomic --wait --timeout 20s ${env.addVersion} ${env.addValues} ${env.namespace} --debug incubator/${params.chartname}
+      /usr/local/bin/helm repo update
+      /usr/local/bin/helm --install canary-${params.chartname} --atomic --wait --timeout 20s ${env.addVersion} ${env.addValues} ${env.namespace} --debug incubator/${params.chartname}
       """
     }
   }
