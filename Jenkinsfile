@@ -16,7 +16,6 @@ pipeline {
     }
 
 stages {
-  stages {
     stage("parameterizing") {
         steps {
             script {
