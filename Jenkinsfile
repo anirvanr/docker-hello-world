@@ -4,7 +4,8 @@ def charts
 def versions
 
 node {
-  all_charts = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}'", returnStdout: true).trim()
+  sh "/usr/local/bin/helm repo update chartmuseum"
+  chartname = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}'", returnStdout: true).trim()
 }
 
 pipeline {
@@ -12,7 +13,7 @@ pipeline {
 
     parameters {
             choice(name: 'Invoke_Parameters', choices:"Yes\nNo", description: "Do you whish to do a dry?" )
-            choice(name: 'charts', choices:"${all_charts}", description: "")
+            choice(name: 'charts', choices:"${chartname}", description: "")
     }
 
 stages {
