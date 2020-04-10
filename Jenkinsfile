@@ -34,7 +34,7 @@ def helmDeploy(Map args) {
 }
 
 pipeline {
-  agent { node { label 'linux' } }
+  agent any
 
   environment {
     container_name = "hello-world"
@@ -132,7 +132,7 @@ pipeline {
           def pwd = pwd()
           def app_name = "${container_name}"
           def chart_dir = "${pwd}/charts/${container_name}"
-          run helm chart linter
+          // run helm chart linter
           helmLint(chart_dir,deployEnv)
           kubectlTest()
           helmPush(chart_dir)
