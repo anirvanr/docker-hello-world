@@ -64,7 +64,7 @@ pipeline {
     string(
         name: 'values',
         description: 'Any values to overwrite?',
-        defaultValue: 'env.open.key1=val1,key2=val2'
+        defaultValue: 'key1=val1,key2=val2'
     )
   }
 
