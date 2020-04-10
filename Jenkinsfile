@@ -135,7 +135,7 @@ pipeline {
           // run helm chart linter
           helmLint(chart_dir,deployEnv)
           kubectlTest()
-          helmPush()
+          helmPush(chart_dir)
           helmDeploy(
           dry_run       : false,
           name          : app_name,
