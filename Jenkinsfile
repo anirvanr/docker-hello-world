@@ -37,7 +37,7 @@ def charts
 
 node {
   sh """
-  /usr/local/bin/helm search chartmuseum > commandResult
+  /usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print $1}}' | awk -F / '{print $2}' > commandResult
   cat commandResult
   """
 // charts = readFile('commandResult').trim()
