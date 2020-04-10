@@ -77,11 +77,11 @@ pipeline {
         /usr/local/bin/helm plugin list | grep push
             if [ [ $? -eq 1 ] ]; then
                 echo "helm push plugin not found, installing ..."
-                /usr/local/bin/helm plugin install https://github.com/chartmuseum/helm-push.git --version 0.8.1
+                /usr/local/bin/helm plugin install https://github.com/chartmuseum/helm-push.git
             else
                 echo "helm push plugin already exists, skipping..."
             fi
-        /usr/local/bin/helm push --context-path=/techm/megafon ${chart_dir} chartmuseum --username ${helm_user} --password ${helm_pass}
+        /usr/local/bin/helm push --context-path=/techm/megafon ${pwd}/charts/${container_name} chartmuseum --username ${helm_user} --password ${helm_pass}
         '''
         }
       }
