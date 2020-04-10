@@ -138,100 +138,12 @@ pipeline {
               default:
                   env.namespace = '--namespace default';
           }
-      }
-      
+      }      
       sh """
       /usr/local/bin/helm repo update
       /usr/local/bin/helm --install canary-${params.chartname} --atomic --wait --timeout 20s ${env.addVersion} ${env.addValues} ${env.namespace} --debug incubator/${params.chartname}
       """
+      }
     }
   }
-    // stage('Deploy development') {
-    //     when {
-    //       expression { BRANCH_NAME ==~ /develop/ }
-    //     }
-    //     steps {
-    //       withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "https://${nexus_url}" ]){
-    //       sh '''
-    //       docker_image_hash="$(docker pull ${docker_image} | grep 'Digest: ' | sed 's/Digest: //')"
-    //       /usr/local/bin/kubectl --namespace=development set image deployment/${container_name} ${container_name}=${docker_image}@${docker_image_hash} --record
-    //       '''
-    //     }
-    //   }
-    // }
-    // stage('Deploy production') {
-    //     when {
-    //       expression { BRANCH_NAME ==~ /master/ }
-    //     }
-    //     steps {
-    //       withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "https://${nexus_url}" ]){
-    //       sh '''
-    //       echo ${kubectlTest}
-    //       docker_image_hash="$(docker pull $docker_image:${build_tag} | grep 'Digest: ' | sed 's/Digest: //')"
-    //       /usr/local/bin/kubectl --namespace=production set image deployment/${container_name} ${container_name}=${docker_image}@${docker_image_hash} --record
-    //       '''
-    //     }
-    //   }
-    // }
-    // stage('analyze') {
-    //       when {
-    //       branch 'master'
-    //     }
-    //     steps {
-    //       sh 'echo "dk.dynacommercelab.com/hello-world:latest `pwd`/Dockerfile" > anchore_images'
-    //       anchore name: 'anchore_images'
-    //       }
-    //     }
-    // stage('Publish') {
-    //     when {
-    //       branch 'master'
-    //     }
-    //     environment {
-    //       DOCKER_IMAGE_MF = "dkmf.dynacommercelab.com/${NAME}"
-    //       nexus_url_MF = "https://dkmf.dynacommercelab.com"
-    //     }
-    //     steps {
-    //       script {
-    //           timeout(time: 1, unit: 'MINUTES') {
-    //           env.IMAGE_PUSH = input message: 'User input required', ok: 'Continue',
-    //           parameters: [choice(name: 'Upload docker image', choices: 'yes\nno', description: '')]
-    //           }
-    //       withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "${nexus_url_MF}" ]){
-    //       sh '''
-    //       if [[ ${IMAGE_PUSH} == 'yes' ]]
-    //       then
-    //           docker tag ${DOCKER_IMAGE}:${TAG} ${DOCKER_IMAGE_MF}:${TAG}
-    //           docker push ${DOCKER_IMAGE_MF}:${TAG}
-    //       else
-    //         echo "don't do that"
-    //       fi
-    //       '''
-    //       } 
-    //     } 
-    //   }
-    // }
-  }
-  // post {
-  //       always {
-
-  //           echo 'slack notification....'
-  //           script {
-  //               if (BRANCH_NAME.startsWith('PR')) {
-  //                   env.channel = '#jenkins-ci'
-  //               } else {
-  //                   env.channel = '#jenkins-ci'
-  //               }
-  //           }
-  //       }
-
-  //       failure {
-  //           echo 'Failure!'
-  //           slackSend channel: env.channel, color: "danger", message: "Build Failed: <${env.JOB_DISPLAY_URL}|${env.JOB_NAME}> <${env.RUN_DISPLAY_URL}|#${env.BUILD_NUMBER}>"
-  //       }
-
-  //       success {
-  //           echo 'Success!'
-  //           slackSend channel: env.channel, color: "good", message: "Build Passed: <${env.JOB_DISPLAY_URL}|${env.JOB_NAME}> <${env.RUN_DISPLAY_URL}|#${env.BUILD_NUMBER}>"
-  //       }
-  //   }
 }
