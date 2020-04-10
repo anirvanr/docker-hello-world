@@ -79,61 +79,6 @@ pipeline {
     )
   }
 
-  // stages {
-  //   stage('Dockerize') {
-  //     steps {
-  //       echo 'Dockerizing...'
-  //         withDockerRegistry([ credentialsId: "${nexus_creds_id}", url: "https://${nexus_url}" ]){
-  //         script {
-  //           if ( env.BRANCH_NAME == "develop" ){
-  //           sh '''
-  //             docker build -f "Dockerfile" -t ${docker_image}:latest .
-  //             docker push ${docker_image} || { >&2 echo "Failed to push build_tag 'latest' image ${docker_image}"; exit 1; }
-  //           '''
-  //           } else if ( env.BRANCH_NAME == "master" ){
-  //           sh '''
-  //             docker build -f "Dockerfile" -t ${docker_image}:${docker_tag} .
-  //             docker push ${docker_image}:${docker_tag} || { >&2 echo "Failed to push build_tag '${docker_tag}' image ${docker_image}"; exit 1; }
-  //           '''
-  //           } else{
-  //             deployEnv = "none"
-  //             error "Building unknown branch"
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  //   stage ('helm deploy') {
-  //     steps{
-  //       withCredentials([usernamePassword(credentialsId: 'helm-repo-creds', passwordVariable: 'helm_pass', usernameVariable: 'helm_user')]) {
-  //       script {
-  //         if ( env.BRANCH_NAME == "develop" ){
-  //           deployEnv = "development"
-  //         } else if ( env.BRANCH_NAME == "master" ){
-  //           deployEnv = "production"
-  //         } else{
-  //           deployEnv = "none"
-  //           error "Building unknown branch"
-  //         }
-  //         def pwd = pwd()
-  //         def app_name = "${container_name}"
-  //         def chart_dir = "${pwd}/charts/${container_name}"
-  //         // run helm chart linter
-  //         helmLint(chart_dir,deployEnv)
-  //         kubectlTest()
-  //         helmPush(chart_dir)
-  //         helmDeploy(
-  //           dry_run     : false,
-  //           name        : app_name,
-  //           chart_dir   : chart_dir,
-  //           tag         : build_tag,
-  //           env         : deployEnv
-  //           )
-  //         }
-  //       }
-  //     }
-  //   }
-
   stage('Manual Deployment'){
   when { expression { BRANCH_NAME ==~ /develop/ } }
   steps{
@@ -157,4 +102,3 @@ pipeline {
       }
     }
   }
-}
