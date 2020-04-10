@@ -36,7 +36,9 @@ def helmDeploy(Map args) {
 def charts
 
 node {
-        charts = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print $1}}' | awk -F / '{print $2}'", returnStdout: true).trim()
+  sh "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print $1}}' | awk -F / '{print $2}' > commandResult"
+charts = readFile('commandResult').trim()
+        // charts = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print $1}}' | awk -F / '{print $2}'", returnStdout: true).trim()
 }
 
 pipeline {
