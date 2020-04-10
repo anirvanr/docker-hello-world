@@ -13,6 +13,14 @@ def helmLint(String chart_dir, String deployEnv) {
     sh "/usr/local/bin/helm lint ${chart_dir} -f ${chart_dir}/${deployEnv}-values.yaml"
 }
 
+def helmPush(String chart_dir) {
+    sh """
+      /usr/local/bin/helm init --client-only
+      /usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon
+      /usr/local/bin/helm push --context-path=/techm/megafon ${chart_dir} chartmuseum --username ${helm_user} --password ${helm_pass}
+    """
+}
+
 def helmDeploy(Map args) {
     //configure helm client and confirm tiller process is installed
     if (args.dry_run) {
@@ -68,24 +76,24 @@ pipeline {
     //     }
     //   }
     // }
-    stage ('helm push') {
-      steps{
-        withCredentials([usernamePassword(credentialsId: 'helm-repo-creds', passwordVariable: 'helm_pass', usernameVariable: 'helm_user')]) {
-        sh '''
-        /usr/local/bin/helm init --client-only
-        /usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon
-        /usr/local/bin/helm plugin list | grep push
-            if [ [ $? -eq 1 ] ]; then
-                echo "helm push plugin not found, installing ..."
-                /usr/local/bin/helm plugin install https://github.com/chartmuseum/helm-push.git
-            else
-                echo "helm push plugin already exists, skipping..."
-            fi
-        /usr/local/bin/helm push --context-path=/techm/megafon ${pwd}/charts/${container_name} chartmuseum --username ${helm_user} --password ${helm_pass}
-        '''
-        }
-      }
-    }
+    // stage ('helm push') {
+    //   steps{
+    //     withCredentials([usernamePassword(credentialsId: 'helm-repo-creds', passwordVariable: 'helm_pass', usernameVariable: 'helm_user')]) {
+    //     sh '''
+    //     /usr/local/bin/helm init --client-only
+    //     /usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon
+    //     /usr/local/bin/helm plugin list | grep push
+    //         if [ [ $? -eq 1 ] ]; then
+    //             echo "helm push plugin not found, installing ..."
+    //             /usr/local/bin/helm plugin install https://github.com/chartmuseum/helm-push.git
+    //         else
+    //             echo "helm push plugin already exists, skipping..."
+    //         fi
+    //     /usr/local/bin/helm push --context-path=/techm/megafon ${PWD}/charts/${container_name} chartmuseum --username ${helm_user} --password ${helm_pass}
+    //     '''
+    //     }
+    //   }
+    // }
     stage('Dockerize') {
       steps {
         echo 'Dockerizing...'
@@ -111,6 +119,7 @@ pipeline {
     }
     stage ('helm deploy') {
       steps{
+        withCredentials([usernamePassword(credentialsId: 'helm-repo-creds', passwordVariable: 'helm_pass', usernameVariable: 'helm_user')]) {
         script {
           if ( env.BRANCH_NAME == "develop" ){
             deployEnv = "development"
@@ -126,6 +135,7 @@ pipeline {
           // run helm chart linter
           helmLint(chart_dir,deployEnv)
           kubectlTest()
+          helmPush()
           helmDeploy(
           dry_run       : false,
           name          : app_name,
@@ -133,6 +143,7 @@ pipeline {
           tag           : build_tag,
           env           : deployEnv
           )
+          }
         }
       }
     }
