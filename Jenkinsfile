@@ -78,7 +78,7 @@ pipeline {
         defaultValue: 'key1=val1,key2=val2'
     )
   }
-
+stages { 
   stage('Manual Deployment'){
   when { expression { BRANCH_NAME ==~ /develop/ } }
   steps{
@@ -102,3 +102,4 @@ pipeline {
       }
     }
   }
+}
