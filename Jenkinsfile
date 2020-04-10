@@ -36,6 +36,7 @@ def helmDeploy(Map args) {
 pipeline {
   agent {
         node {
+          any
           def pwd = pwd()
           def app_name = "${container_name}"
           def chart_dir = "${pwd}/charts/${container_name}"
