@@ -3,7 +3,7 @@
 def charts
 def versions
 
-node {
+list {
   charts = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}'", returnStdout: true).trim()
 }
 
@@ -12,7 +12,7 @@ pipeline {
 
     parameters {
             choice(name: 'Invoke_Parameters', choices:"Yes\nNo", description: "Do you whish to do a dry run to grab parameters?" )
-            choice(name: 'charts', choices:"${charts}", description: "")
+            choice(name: 'Choose Chart!', choices:"${charts}", description: "")
     }
 
 stages {
@@ -23,7 +23,7 @@ stages {
           def version_collection
           def chosen_chart = "${params.charts}"
           version_collection = sh (script: "/usr/local/bin/helm search -l $chosen_chart | awk '{if (NR!=1) {print \$2}}'", returnStdout: true).trim()
-          versions = input message: 'Choose testload version!', ok: 'SET', parameters: [choice(name: 'Chart Version to deploy', choices: "${version_collection}", description: '')]
+          versions = input message: 'Choose version!', ok: 'SET', parameters: [choice(name: 'Chart Version to deploy', choices: "${version_collection}", description: '')]
       }
     }
   }              
