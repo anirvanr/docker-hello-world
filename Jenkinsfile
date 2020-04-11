@@ -64,6 +64,7 @@ stages {
   stage("list values") {
     steps {
       script{
+        sh 'echo "\033[1;4;37;42m Showing values \033[0m"'
         sh "/usr/local/bin/helm fetch chartmuseum/$chosen_chart --untar --untardir /tmp/charts --version $versions && cat /tmp/charts/$chosen_chart/$namespace-values.yaml"
         }
       }
