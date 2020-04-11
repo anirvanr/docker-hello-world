@@ -75,9 +75,9 @@ stages {
       sh """
       if [[ $addValues = "none" ]]
         then
-            echo $addValues
+            /usr/local/bin/helm upgrade --install $chosen_chart-$namespace --namespace $namespace chartmuseum/$chosen_chart --dry-run
       else
-          echo not good
+          /usr/local/bin/helm upgrade --install $chosen_chart-$namespace --set-string ${params.values} --namespace $namespace chartmuseum/$chosen_chart --dry-run
       fi
       """
       }
