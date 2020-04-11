@@ -4,7 +4,7 @@ def charts
 def versions
 def namespace
 def addValues
-def chosen_chart
+def chosen_chart = "${params.charts}"
 
 node {  
   sh "/usr/local/bin/helm repo update chartmuseum"
@@ -33,7 +33,7 @@ stages {
   stage("Installed Helm Charts") {
     steps {
       script{
-        chosen_chart = "${params.charts}"
+        // chosen_chart = "${params.charts}"
         sh "/usr/local/bin/helm ls --deployed $chosen_chart --output yaml"
         }
       }
