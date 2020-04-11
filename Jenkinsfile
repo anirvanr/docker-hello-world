@@ -4,6 +4,7 @@ def charts
 def versions
 def namespace
 def addValues
+def chosen_chart
 
 node {  
   sh "/usr/local/bin/helm repo update chartmuseum"
@@ -14,7 +15,7 @@ pipeline {
   agent any
 
   parameters {
-          choice(name: 'dry_run', choices:"Yes\nNo", description: "Do you whish to do a dry?" )
+          choice(name: 'DryRun', choices:"Yes\nNo", description: "Do you whish to do a dry run?" )
           choice(name: 'charts', choices:"${chartname}", description: "Which Chart do you want to deploy?")
   }
 
@@ -22,7 +23,7 @@ stages {
   stage("parameterizing") {
     steps {
         script {
-          if ("${params.dry_run}" == "Yes") {
+          if ("${params.DryRun}" == "Yes") {
           currentBuild.result = 'ABORTED'
           error('DRY RUN COMPLETED. JOB PARAMETERIZED.')
         }
@@ -32,7 +33,7 @@ stages {
   stage("Installed Helm Charts") {
     steps {
       script{
-        def chosen_chart = "${params.charts}"
+        chosen_chart = "${params.charts}"
         sh "/usr/local/bin/helm ls --deployed $chosen_chart --output yaml"
         }
       }
@@ -48,7 +49,7 @@ stages {
     steps {
         script {
           def version_collection
-          def chosen_chart = "${params.charts}"
+          // def chosen_chart = "${params.charts}"
           version_collection = sh (script: "/usr/local/bin/helm search --versions $chosen_chart | awk '{if (NR!=1) {print \$2}}'", returnStdout: true).trim()
           versions = input message: 'Choose version!', parameters: [choice(name: 'version', choices: "${version_collection}", description: '')]
         }   
@@ -57,19 +58,27 @@ stages {
   stage("view values") {
     steps {
       script{
-        def chosen_chart = "${params.charts}"
+        // def chosen_chart = "${params.charts}"
         sh "/usr/local/bin/helm fetch chartmuseum/$chosen_chart --untar --untardir /tmp/charts --version $versions && cat /tmp/charts/$chosen_chart/$namespace-values.yaml"
         }
       }
     }
-  stage("edit values") {
+  stage("Deploy") {
     steps {
       script{
-        def chosen_chart = "${params.charts}"
+        // def chosen_chart = "${params.charts}"
         addValues = input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: ' ', description: 'Any values to overwrite?')]
         sh """
         /usr/local/bin/helm upgrade --install $chosen_chart-$namespace --set-string $addValues --namespace $namespace chartmuseum/$chosen_chart --dry-run
         """
+        }
+      }
+    } 
+  stage("Status") {
+    steps {
+      script{
+        // def chosen_chart = "${params.charts}"
+        sh "/usr/local/bin/helm ls --deployed $chosen_chart --namespace $namespace --output yaml"
         }
       }
     }           
