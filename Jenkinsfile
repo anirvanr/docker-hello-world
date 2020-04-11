@@ -15,6 +15,12 @@ node {
 pipeline {
   agent any
 
+  options {
+    timeout(time: 60, unit: 'MINUTES')
+    timestamps()
+    buildDiscarder(logRotator(numToKeepStr: '5'))
+  }
+  
   parameters {
           choice(name: 'DryRun', choices:"Yes\nNo", description: "Do you whish to do a dry run?" )
           choice(name: 'charts', choices:"${chartname}", description: "Which Chart do you want to deploy?")
@@ -65,14 +71,15 @@ stages {
     steps {
       script{
         // addValues = input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: 'none', description: 'Any values to overwrite?')]
-        input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: 'none', description: 'Any values to overwrite?')]
-        if (param.values == 'none') {
-          sh "echo $param.values"
-        } else if (param.values != 'none') {
-          sh "echo $param.values"
-        } else {
-          sh "echo nothing"
-        }
+      addValues = input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: 'none', description: 'Any values to overwrite?')]
+      sh """
+      if [[ $addValues = "none" ]]
+        then
+            echo $addValues
+      else
+          echo not good
+      fi
+      """
       }
     }
   }
