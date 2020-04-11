@@ -32,7 +32,7 @@ stages {
     steps {
       script{
         def chosen_chart = "${params.charts}"
-        sh "/usr/local/bin/helm ls $chosen_chart"
+        sh "/usr/local/bin/helm ls --deployed $chosen_chart --output yaml"
         }
       }
     }
