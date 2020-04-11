@@ -5,7 +5,7 @@ def charts
 def versions
 def namespace
 def addValues
-def chosen_chart = params.charts
+def chosen_chart = "${params.charts}"
 
 node {  
   sh '''
