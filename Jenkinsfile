@@ -49,7 +49,7 @@ stages {
     steps {
       script{
         def chosen_chart = "${params.charts}"
-        sh "/usr/local/bin/helm fetch chartmuseum/$chosen_chart --untar --untardir /tmp/charts --version $versions && cat /tmp/charts/hello-world/$namespace-values.yaml"
+        sh "/usr/local/bin/helm fetch chartmuseum/$chosen_chart --untar --untardir /tmp/charts --version $versions && cat /tmp/charts/$chosen_chart/$namespace-values.yaml"
         }
       }
     }            
