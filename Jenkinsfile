@@ -68,7 +68,7 @@ stages {
         def chosen_chart = "${params.charts}"
         addValues = input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: ' ', description: 'Any values to overwrite?')]
         sh """
-        /usr/local/bin/helm upgrade --install $chosen_chart-$namespace --set-string $addValues --namespace $namespace chartmuseum/$chosen_chart --dry-run
+        /usr/local/bin/helm upgrade --install $chosen_chart-$namespace --set $addValues --namespace $namespace --atomic --timeout 60 chartmuseum/$chosen_chart --dry-run
         """
         }
       }
