@@ -61,7 +61,6 @@ stages {
         if (params.values) { env.addValues = "--set-string ${params.values}"}
         else { env.addValues = ' '  }
         sh """
-        //  helm upgrade --install $chosen_chart-$namespace $versions ${env.addValues} $namespace --debug incubator/${params.chartname}
         helm install --name $chosen_chart-$namespace ${env.addValues} --namespace $namespace chartmuseum/$chosen_chart --dry-run
         """
         }
