@@ -6,7 +6,7 @@ def namespace
 
 node {  
   sh "/usr/local/bin/helm repo update chartmuseum"
-  chartname = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}'", returnStdout: true).trim()
+  chartname = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {split(\$1,F,"/"); print F[2]}}'", returnStdout: true).trim()
 }
 
 pipeline {
