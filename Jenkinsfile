@@ -56,9 +56,14 @@ stages {
   stage("edit values") {
     steps {
       script{
+        def chosen_chart = "${params.charts}"
         input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: "key1=val1,key2=val2", description: 'Any values to overwrite?')]
-                    if (params.values) { env.addValues = "--set-string ${params.values}"}
-                    else { env.addValues = ' '  }
+        if (params.values) { env.addValues = "--set-string ${params.values}"}
+        else { env.addValues = ' '  }
+        sh """
+        //  helm upgrade --install $chosen_chart-$namespace $versions ${env.addValues} $namespace --debug incubator/${params.chartname}
+        helm install --name $chosen_chart-$namespace ${env.addValues} --namespace $namespace chartmuseum/$chosen_chart --dry-run
+        """
         }
       }
     }           
