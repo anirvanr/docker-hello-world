@@ -52,6 +52,15 @@ stages {
         sh "/usr/local/bin/helm fetch chartmuseum/$chosen_chart --untar --untardir /tmp/charts --version $versions && cat /tmp/charts/$chosen_chart/$namespace-values.yaml"
         }
       }
-    }            
+    }
+  stage("edit values") {
+    steps {
+      script{
+        input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: "key1=val1,key2=val2", description: 'Any values to overwrite?')]
+                    if (params.values) { env.addValues = "--set-string ${params.values}"}
+                    else { env.addValues = ' '  }
+        }
+      }
+    }           
   }
 }
