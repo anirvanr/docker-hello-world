@@ -60,10 +60,10 @@ stages {
         input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: "key1=val1,key2=val2", description: 'Any values to overwrite?')]
         if (params.values) { env.addValues = "--set-string ${params.values}"}
         else { env.addValues = ' '  }
-        }
         sh """
         /usr/local/bin/helm install --name $chosen_chart-$namespace ${env.addValues} --namespace $namespace chartmuseum/$chosen_chart --dry-run
         """
+        }
       }
     }           
   }
