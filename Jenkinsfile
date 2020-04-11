@@ -103,7 +103,7 @@ stages {
       script{
         sh """
         set +x
-        echo "\033[1;4;37;42m Status \033[0m"
+        echo "\033[1;4;37;42m check status of deployment \033[0m"
         /usr/local/bin/helm ls --deployed $deployment_name --namespace $environment --output yaml
         """
         }
