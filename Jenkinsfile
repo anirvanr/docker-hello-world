@@ -5,7 +5,7 @@ def charts
 def versions
 def namespace
 def addValues
-def chosen_chart = "${params.charts}"
+def chosen_chart = params.charts
 
 node {  
   sh '''
@@ -46,11 +46,11 @@ stages {
   stage("installed charts") {
     steps {
       script{
-        sh '''
+        sh """
         set +x
         echo "\033[1;4;37;42m check the information of our deployed chart \033[0m"
         /usr/local/bin/helm ls --deployed $chosen_chart --output yaml
-        '''
+        """
         }
       }
     }
@@ -73,11 +73,11 @@ stages {
   stage("list values") {
     steps {
       script{
-        sh '''
+        sh """
         set +x
         echo "\033[1;4;37;42m fetch a reference values.yaml \033[0m"
-        /usr/local/bin/helm fetch chartmuseum/$chosen_chart --untar --untardir /tmp/charts --version $versions && cat /tmp/charts/$chosen_chart/$namespace-values.yaml"
-        '''
+        /usr/local/bin/helm fetch chartmuseum/$chosen_chart --untar --untardir /tmp/charts --version $versions && cat /tmp/charts/$chosen_chart/$namespace-values.yaml
+        """
         }
       }
     }
@@ -85,7 +85,7 @@ stages {
     steps {
       script{
       addValues = input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: 'none', description: 'Any values to overwrite?')]
-      sh '''
+      sh """
       set +x
       echo "\033[1;4;37;42m Installing the $chosen_chart Helm Chart \033[0m"
       if [[ $addValues = "none" ]]
@@ -94,7 +94,7 @@ stages {
         else
           /usr/local/bin/helm upgrade --install $chosen_chart-$namespace --set-string $addValues --namespace $namespace chartmuseum/$chosen_chart --dry-run
       fi
-      '''
+      """
       }
     }
   }
