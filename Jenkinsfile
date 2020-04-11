@@ -28,6 +28,21 @@ stages {
       }
     }
   }
+  stage("choose env") {
+    steps {
+      script{
+        namespace = input message: 'Choose namespace!', parameters: [choice(name: 'namespace', choices: "development\nproduction", description: '')]
+        }
+      }
+    }
+  stage("Installed Helm Charts") {
+    steps {
+      script{
+        def chosen_chart = "${params.charts}"
+        sh "/usr/local/bin/helm $chosen_chart"
+        }
+      }
+    }
   stage("choose version") {
     steps {
         script {
@@ -36,13 +51,6 @@ stages {
           version_collection = sh (script: "/usr/local/bin/helm search --versions $chosen_chart | awk '{if (NR!=1) {print \$2}}'", returnStdout: true).trim()
           versions = input message: 'Choose version!', parameters: [choice(name: 'version', choices: "${version_collection}", description: '')]
         }   
-      }
-    }
-  stage("choose env") {
-    steps {
-      script{
-        namespace = input message: 'Choose namespace!', parameters: [choice(name: 'namespace', choices: "development\nproduction", description: '')]
-        }
       }
     }
   stage("view values") {
@@ -61,7 +69,7 @@ stages {
         if (params.values) { env.addValues = "--set-string ${params.values}"}
         else { env.addValues = ' '  }
         sh """
-        /usr/local/bin/helm upgrade --install --name $chosen_chart-$namespace ${env.addValues} --namespace $namespace chartmuseum/$chosen_chart --dry-run
+        /usr/local/bin/helm upgrade --install $chosen_chart-$namespace ${env.addValues} --namespace $namespace chartmuseum/$chosen_chart --dry-run
         """
         }
       }
