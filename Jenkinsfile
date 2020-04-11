@@ -63,21 +63,18 @@ stages {
   stage("deploy") {
     steps {
       script{
-        addValues = input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: 'none', description: 'Any values to overwrite?')]
-        if ( params.values ==  'none' )
-        {
-          sh """
-            /usr/local/bin/helm upgrade --install $chosen_chart-$namespace --namespace $namespace chartmuseum/$chosen_chart --dry-run
-            exit 0
-          """
+        // addValues = input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: 'none', description: 'Any values to overwrite?')]
+        input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: 'none', description: 'Any values to overwrite?')]
+        if (param.values == 'none') {
+          sh "echo $param.values"
+        } else if (param.values != 'none') {
+          sh "echo $param.values"
         } else {
-          sh """
-            /usr/local/bin/helm upgrade --install $chosen_chart-$namespace --set-string ${params.values} --namespace $namespace chartmuseum/$chosen_chart --dry-run
-          """
-          }
+          sh "echo nothing"
         }
       }
-    } 
+    }
+  }
   stage("status") {
     steps {
       script{
