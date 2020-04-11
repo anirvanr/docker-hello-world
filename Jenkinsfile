@@ -8,7 +8,12 @@ def addValues
 def chosen_chart = params.charts
 
 node {  
-  sh "/usr/local/bin/helm repo update chartmuseum"
+  sh '''
+  set +x
+  echo "\033[1;4;37;42m reindex the helm repository \033[0m"
+  /usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon
+  /usr/local/bin/helm repo update chartmuseum
+  '''
   chartname = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}' | awk -F/ '{print \$2}'", returnStdout: true).trim()
 }
 
@@ -23,7 +28,7 @@ pipeline {
   }
   
   parameters {
-          choice(name: 'DryRun', choices:"Yes\nNo", description: "Do you whish to do a dry run?" )
+          choice(name: 'dryrun', choices:"Yes\nNo", description: "Do you whish to do a dry run?" )
           choice(name: 'charts', choices:"${chartname}", description: "Which Chart do you want to deploy?")
   }
 
@@ -31,7 +36,7 @@ stages {
   stage("parameterizing") {
     steps {
         script {
-          if ("${params.DryRun}" == "Yes") {
+          if ("${params.dryrun}" == "Yes") {
           currentBuild.result = 'ABORTED'
           error('DRY RUN COMPLETED. JOB PARAMETERIZED.')
         }
@@ -41,7 +46,11 @@ stages {
   stage("installed charts") {
     steps {
       script{
-        sh "/usr/local/bin/helm ls --deployed $chosen_chart --output yaml"
+        sh '''
+        set +x
+        echo "\033[1;4;37;42m check the information of our deployed chart \033[0m"
+        /usr/local/bin/helm ls --deployed $chosen_chart --output yaml
+        '''
         }
       }
     }
@@ -64,31 +73,39 @@ stages {
   stage("list values") {
     steps {
       script{
-        sh 'echo "\033[1;4;37;42m Showing values \033[0m"'
-        sh "/usr/local/bin/helm fetch chartmuseum/$chosen_chart --untar --untardir /tmp/charts --version $versions && cat /tmp/charts/$chosen_chart/$namespace-values.yaml"
+        sh '''
+        set +x
+        echo "\033[1;4;37;42m fetch a reference values.yaml \033[0m"
+        /usr/local/bin/helm fetch chartmuseum/$chosen_chart --untar --untardir /tmp/charts --version $versions && cat /tmp/charts/$chosen_chart/$namespace-values.yaml"
+        '''
         }
       }
     }
   stage("deploy") {
     steps {
       script{
-        // addValues = input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: 'none', description: 'Any values to overwrite?')]
       addValues = input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: 'none', description: 'Any values to overwrite?')]
-      sh """
+      sh '''
+      set +x
+      echo "\033[1;4;37;42m Installing the $chosen_chart Helm Chart \033[0m"
       if [[ $addValues = "none" ]]
         then
             /usr/local/bin/helm upgrade --install $chosen_chart-$namespace --namespace $namespace chartmuseum/$chosen_chart --dry-run
-      else
+        else
           /usr/local/bin/helm upgrade --install $chosen_chart-$namespace --set-string $addValues --namespace $namespace chartmuseum/$chosen_chart --dry-run
       fi
-      """
+      '''
       }
     }
   }
   stage("status") {
     steps {
       script{
-        sh "/usr/local/bin/helm ls --deployed $chosen_chart --namespace $namespace --output yaml"
+        sh '''
+        set +x
+        echo "\033[1;4;37;42m deploying $chosen_chart from template \033[0m"
+        /usr/local/bin/helm ls --deployed $chosen_chart --namespace $namespace --output yaml
+        '''
         }
       }
     }           
