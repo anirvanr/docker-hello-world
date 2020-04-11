@@ -1,10 +1,11 @@
 #!groovy
 
+// Define variables (based on parameters set in a Jenkins job)
 def charts
 def versions
 def namespace
 def addValues
-def chosen_chart = "${params.charts}"
+def chosen_chart = params.charts
 
 node {  
   sh "/usr/local/bin/helm repo update chartmuseum"
