@@ -2,15 +2,15 @@
 
 // Define variables (based on parameters set in a Jenkins job)
 def charts
-def versions
-def namespace
-def addValues
-def chosen_chart = params.charts
+def version
+def environment
+def deploy_args
+def deployment_name = params.charts
 
 node {  
   sh '''
   set +x
-  echo "\033[1;4;37;42m reindex the helm repository \033[0m"
+  echo "\033[1;4;37;42m updating helm client repository information \033[0m"
   /usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon
   /usr/local/bin/helm repo update chartmuseum
   '''
@@ -48,8 +48,8 @@ stages {
       script{
         sh """
         set +x
-        echo "\033[1;4;37;42m check the information of our deployed chart \033[0m"
-        /usr/local/bin/helm ls --deployed $chosen_chart --output yaml
+        echo "\033[1;4;37;42m Check the information of our deployed chart \033[0m"
+        /usr/local/bin/helm ls --deployed $deployment_name --output yaml
         """
         }
       }
@@ -57,7 +57,7 @@ stages {
   stage("choose env") {
     steps {
       script{
-        namespace = input message: 'Choose namespace!', parameters: [choice(name: 'namespace', choices: "development\nproduction", description: '')]
+        environment = input message: 'Choose namespace!', parameters: [choice(name: 'namespace', choices: "development\nproduction", description: '')]
         }
       }
     }
@@ -65,8 +65,8 @@ stages {
     steps {
         script {
           def version_collection
-          version_collection = sh (script: "/usr/local/bin/helm search --versions $chosen_chart | awk '{if (NR!=1) {print \$2}}'", returnStdout: true).trim()
-          versions = input message: 'Choose version!', parameters: [choice(name: 'version', choices: "${version_collection}", description: '')]
+          version_collection = sh (script: "/usr/local/bin/helm search --versions $deployment_name | awk '{if (NR!=1) {print \$2}}'", returnStdout: true).trim()
+          version = input message: 'Choose version!', parameters: [choice(name: 'version', choices: "${version_collection}", description: '')]
         }   
       }
     }
@@ -75,8 +75,8 @@ stages {
       script{
         sh """
         set +x
-        echo "\033[1;4;37;42m fetch a reference values.yaml \033[0m"
-        /usr/local/bin/helm fetch chartmuseum/$chosen_chart --untar --untardir /tmp/charts --version $versions && cat /tmp/charts/$chosen_chart/$namespace-values.yaml
+        echo "\033[1;4;37;42m Fetch a reference values.yaml \033[0m"
+        /usr/local/bin/helm fetch chartmuseum/$deployment_name --untar --untardir /tmp/charts --version $version && cat /tmp/charts/$deployment_name/$environment-values.yaml
         """
         }
       }
@@ -84,15 +84,15 @@ stages {
   stage("deploy") {
     steps {
       script{
-      addValues = input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: 'none', description: 'Any values to overwrite?')]
+      deploy_args = input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: 'none', description: 'Any values to overwrite?')]
       sh """
       set +x
-      echo "\033[1;4;37;42m Installing the $chosen_chart Helm Chart \033[0m"
-      if [[ $addValues = "none" ]]
+      echo "\033[1;4;37;42m Installing the $deployment_name Helm Chart \033[0m"
+      if [[ $deploy_args = "none" ]]
         then
-            /usr/local/bin/helm upgrade --install $chosen_chart-$namespace --namespace $namespace chartmuseum/$chosen_chart --dry-run
+            /usr/local/bin/helm upgrade --install $deployment_name-$environment --namespace $environment chartmuseum/$deployment_name --dry-run
         else
-          /usr/local/bin/helm upgrade --install $chosen_chart-$namespace --set-string $addValues --namespace $namespace chartmuseum/$chosen_chart --dry-run
+          /usr/local/bin/helm upgrade --install $deployment_name-$environment --set-string $deploy_args --namespace $environment chartmuseum/$deployment_name --dry-run
       fi
       """
       }
@@ -103,8 +103,8 @@ stages {
       script{
         sh '''
         set +x
-        echo "\033[1;4;37;42m deploying $chosen_chart from template \033[0m"
-        /usr/local/bin/helm ls --deployed $chosen_chart --namespace $namespace --output yaml
+        echo "\033[1;4;37;42m Status \033[0m"
+        /usr/local/bin/helm ls --deployed $deployment_name --namespace $environment --output yaml
         '''
         }
       }
