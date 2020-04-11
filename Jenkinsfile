@@ -10,7 +10,7 @@ def deployment_name = params.charts
 node {  
   sh '''
   set +x
-  echo "\033[1;4;37;42m updating helm client repository information \033[0m"
+  echo "\033[1;4;37;42m Updating helm client repository information \033[0m"
   /usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon
   /usr/local/bin/helm repo update chartmuseum
   '''
@@ -86,6 +86,7 @@ stages {
       script{
       deploy_args = input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: 'none', description: 'Any values to overwrite?')]
       sh """
+      set +x
       echo "\033[1;4;37;42m Installing the $deployment_name Helm Chart \033[0m"
       if [[ $deploy_args = "none" ]]
         then
@@ -100,10 +101,11 @@ stages {
   stage("status") {
     steps {
       script{
-        sh '''
+        sh """
+        set +x
         echo "\033[1;4;37;42m Status \033[0m"
         /usr/local/bin/helm ls --deployed $deployment_name --namespace $environment --output yaml
-        '''
+        """
         }
       }
     }           
