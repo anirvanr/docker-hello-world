@@ -71,7 +71,7 @@ stages {
           """
         } else {
           sh """
-            /usr/local/bin/helm upgrade --install $chosen_chart-$namespace --set-string $addValues --namespace $namespace chartmuseum/$chosen_chart --dry-run
+            /usr/local/bin/helm upgrade --install $chosen_chart-$namespace --set-string ${params.values} --namespace $namespace chartmuseum/$chosen_chart --dry-run
           """
           }
         }
