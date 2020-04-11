@@ -28,18 +28,18 @@ stages {
       }
     }
   }
-  stage("choose env") {
-    steps {
-      script{
-        namespace = input message: 'Choose namespace!', parameters: [choice(name: 'namespace', choices: "development\nproduction", description: '')]
-        }
-      }
-    }
   stage("Installed Helm Charts") {
     steps {
       script{
         def chosen_chart = "${params.charts}"
-        sh "/usr/local/bin/helm $chosen_chart"
+        sh "/usr/local/bin/helm ls $chosen_chart"
+        }
+      }
+    }
+  stage("choose env") {
+    steps {
+      script{
+        namespace = input message: 'Choose namespace!', parameters: [choice(name: 'namespace', choices: "development\nproduction", description: '')]
         }
       }
     }
