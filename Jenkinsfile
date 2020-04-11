@@ -68,6 +68,7 @@ stages {
         {
           sh """
             /usr/local/bin/helm upgrade --install $chosen_chart-$namespace --namespace $namespace chartmuseum/$chosen_chart --dry-run
+            exit 0
           """
         } else {
           sh """
