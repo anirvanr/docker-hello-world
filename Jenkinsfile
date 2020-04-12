@@ -57,7 +57,7 @@ stages {
         sh """
         set +x
         echo "\033[0;32m===> \033[0;34mChecking the information of our deployed chart\033[0;32m <=== \033[0m"
-        echo "\033[0;36m $(/usr/local/bin/helm ls --deployed $chart_name --output json | jq -r .Releases[]) \033[0m"
+        echo "\033[0;36m \$(/usr/local/bin/helm ls --deployed $chart_name --output json | jq -r .Releases[]) \033[0m"
         """
       }
     }
