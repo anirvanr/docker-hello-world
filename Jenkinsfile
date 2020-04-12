@@ -12,7 +12,6 @@ pipeline {
   agent any
 
   options {
-    timeout(time: 60, unit: 'MINUTES')
     ansiColor('xterm')
     buildDiscarder(logRotator(numToKeepStr: '10'))
   }
@@ -68,7 +67,9 @@ stages {
   stage("Choose environment") {
     steps {
       script{
+        timeout(time: 1, unit: "MINUTES") {
         environment = input message: 'Choose namespace!', parameters: [choice(name: 'namespace', choices: "development\nproduction", description: '')]
+        }
       }
     }
   }
@@ -77,7 +78,9 @@ stages {
       script {
         def version_collection
         version_collection = sh (script: "/usr/local/bin/helm search --versions $chart_name | awk '{if (NR!=1) {print \$2}}'", returnStdout: true).trim()
+        timeout(time: 1, unit: "MINUTES") {
         version = input message: 'Choose version!', parameters: [choice(name: 'version', choices: "${version_collection}", description: '')]
+        }
       }   
     }
   }
@@ -97,7 +100,9 @@ stages {
   stage("Deploy chart") {
     steps {
       script{
+        timeout(time: 10, unit: "MINUTES") {
         chart_args = input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: 'none', description: 'Any values to overwrite?')]
+        }
         sh """
         set +x
         echo "\033[0;32m===> \033[0;34mDeploying helm chart\033[0;32m <=== \033[0m"
