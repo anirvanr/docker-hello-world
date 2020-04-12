@@ -84,7 +84,7 @@ stages {
       script{
         sh """
         set +x
-        tmp_dir=$(mktemp -d -t chart-XXXXXXXXXX)
+        tmp_dir=\$(mktemp -d -t chart-XXXXXXXXXX)
         echo "\033[0;32m===> \033[0;34mDownloading $environment-values.yaml from a repository to the local filesystem\033[0;32m <=== \033[0m"
         /usr/local/bin/helm fetch chartmuseum/$chart_name --untar --untardir $tmp_dir --version $version && cat $tmp_dir/$chart_name/$environment-values.yaml
         rm -rf $tmp_dir
