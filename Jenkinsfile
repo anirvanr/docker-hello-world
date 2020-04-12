@@ -29,7 +29,7 @@ pipeline {
   
   parameters {
           choice(name: 'dryrun', choices:"Yes\nNo", description: "Do you whish to do a dry run?" )
-          choice(name: 'charts', choices:"${chartname}", description: "Which Chart do you want to deploy?")
+          // choice(name: 'charts', choices:"${chartname}", description: "Which Chart do you want to deploy?")
   }
 
 stages {
@@ -43,6 +43,13 @@ stages {
       }
     }
   }
+  stage("choose chart") {
+    steps {
+      script{
+        deployment_name = input message: 'Choose chart!', parameters: [choice(name: 'charts', choices:"${chartname}", description: "Which Chart do you want to deploy?")]
+        }
+      }
+    }
   stage("installed charts") {
     steps {
       script{
