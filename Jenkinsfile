@@ -48,7 +48,9 @@ stages {
     steps {
       script{
         chosen_chart = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}' | awk -F/ '{print \$2}'", returnStdout: true).trim()
+        timeout(time: 1, unit: "MINUTES") {
         chart_name = input message: 'Choose chart!', parameters: [choice(name: 'charts', choices:"${chosen_chart}", description: "Which Chart do you want to deploy?")]
+        }
       }
     }
   }
