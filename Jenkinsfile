@@ -37,7 +37,7 @@ stages {
       script{
         sh """
         set +x
-        echo "\033[0;34m Updating helm client repository information \033[0m"
+        echo "\033[0;32m===> \033[0;34mUpdating helm client repository information\033[0;32m <=== \033[0m"
         /usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon
         /usr/local/bin/helm repo update chartmuseum
         """
@@ -57,7 +57,7 @@ stages {
       script{
         sh """
         set +x
-        echo "\033[0;34m Check the information of our deployed chart \033[0m"
+        echo "\033[0;32m===> \033[0;34mCheck the information of our deployed chart\033[0;32m <=== \033[0m"
         /usr/local/bin/helm ls --deployed $chart_name --output yaml
         """
         }
@@ -84,7 +84,7 @@ stages {
       script{
         sh """
         set +x
-        echo "\033[0;34m Downloading $environment-values.yaml from a repository to the local filesystem \033[0m"
+        echo "\033[0;32m===> \033[0;34mDownloading $environment-values.yaml from a repository to the local filesystem\033[0;32m <=== \033[0m"
         /usr/local/bin/helm fetch chartmuseum/$chart_name --untar --untardir /tmp/charts --version $version && cat /tmp/charts/$chart_name/$environment-values.yaml
         """
         }
@@ -96,7 +96,7 @@ stages {
       chart_args = input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: 'none', description: 'Any values to overwrite?')]
       sh """
       set +x
-      echo "\033[0;34m Deploy helm chart \033[0m"
+      echo "\033[0;32m===> \033[0;34mDeploy helm chart\033[0;32m <=== \033[0m"
       if [[ $chart_args = "none" ]]
         then
             /usr/local/bin/helm upgrade --install $chart_name-$environment --namespace $environment chartmuseum/$chart_name --dry-run
@@ -112,7 +112,7 @@ stages {
       script{
         sh """
         set +x
-        echo "\033[0;34m Check status of helm chart \033[0m"
+        echo "\033[0;32m===> \033[0;34mCheck status of helm chart\033[0;32m <=== \033[0m"
         /usr/local/bin/helm ls --deployed $chart_name --namespace $environment --output yaml
         """
         }
