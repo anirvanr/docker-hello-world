@@ -17,14 +17,14 @@ pipeline {
   }
   
   parameters {
-    choice(name: 'dryrun', choices:"Yes\nNo", description: "Do you whish to do a dry run?" )
+    choice(name: 'start', choices:"No\nYes", description: "Do you whish to do a dry run?" )
   }
 
 stages {
   stage("Parameterizing") {
     steps {
         script {
-          if ("${params.dryrun}" == "Yes") {
+          if ("${params.start}" == "No") {
           currentBuild.result = 'ABORTED'
           error('DRY RUN COMPLETED. JOB PARAMETERIZED.')
         }
