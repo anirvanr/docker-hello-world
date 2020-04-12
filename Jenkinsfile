@@ -1,74 +1,121 @@
 #!groovy
 
+// Define variables (based on parameters set in a Jenkins job)
 def charts
-def versions
-def namespace
-def addValues
+def version
+def environment
+def chart_args
+def chart_name
 
-node {  
-  sh "/usr/local/bin/helm repo update chartmuseum"
-  chartname = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}' | awk -F/ '{print \$2}'", returnStdout: true).trim()
-}
 
 pipeline {
   agent any
 
+  options {
+    timeout(time: 60, unit: 'MINUTES')
+    ansiColor('xterm')
+    buildDiscarder(logRotator(numToKeepStr: '10'))
+  }
+  
   parameters {
-          choice(name: 'dry_run', choices:"Yes\nNo", description: "Do you whish to do a dry?" )
-          choice(name: 'charts', choices:"${chartname}", description: "Which Chart do you want to deploy?")
+    choice(name: 'dryrun', choices:"Yes\nNo", description: "Do you whish to do a dry run?" )
   }
 
 stages {
-  stage("parameterizing") {
+  stage("Parameterizing") {
     steps {
         script {
-          if ("${params.dry_run}" == "Yes") {
+          if ("${params.dryrun}" == "Yes") {
           currentBuild.result = 'ABORTED'
           error('DRY RUN COMPLETED. JOB PARAMETERIZED.')
         }
       }
     }
   }
-  stage("Installed Helm Charts") {
+  stage("Update repo") {
     steps {
       script{
-        def chosen_chart = "${params.charts}"
-        sh "/usr/local/bin/helm ls --deployed $chosen_chart --output yaml"
-        }
-      }
-    }
-  stage("choose env") {
-    steps {
-      script{
-        namespace = input message: 'Choose namespace!', parameters: [choice(name: 'namespace', choices: "development\nproduction", description: '')]
-        }
-      }
-    }
-  stage("choose version") {
-    steps {
-        script {
-          def version_collection
-          def chosen_chart = "${params.charts}"
-          version_collection = sh (script: "/usr/local/bin/helm search --versions $chosen_chart | awk '{if (NR!=1) {print \$2}}'", returnStdout: true).trim()
-          versions = input message: 'Choose version!', parameters: [choice(name: 'version', choices: "${version_collection}", description: '')]
-        }   
-      }
-    }
-  stage("view values") {
-    steps {
-      script{
-        def chosen_chart = "${params.charts}"
-        sh "/usr/local/bin/helm fetch chartmuseum/$chosen_chart --untar --untardir /tmp/charts --version $versions && cat /tmp/charts/$chosen_chart/$namespace-values.yaml"
-        }
-      }
-    }
-  stage("edit values") {
-    steps {
-      script{
-        def chosen_chart = "${params.charts}"
-        addValues = input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: ' ', description: 'Any values to overwrite?')]
         sh """
-        /usr/local/bin/helm upgrade --install $chosen_chart-$namespace --set $addValues --namespace $namespace --atomic --timeout 60 chartmuseum/$chosen_chart --dry-run
+        set +x
+        echo "\033[0;32m===> \033[0;34mUpdating helm client repository information\033[0;32m <=== \033[0m"
+        /usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon
+        /usr/local/bin/helm repo update chartmuseum
+        """
+      }
+    }
+  }
+  stage("Choose chart") {
+    steps {
+      script{
+        chosen_chart = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}' | awk -F/ '{print \$2}'", returnStdout: true).trim()
+        chart_name = input message: 'Choose chart!', parameters: [choice(name: 'charts', choices:"${chosen_chart}", description: "Which Chart do you want to deploy?")]
+      }
+    }
+  }
+  stage("View installed charts") {
+    steps {
+      script{
+        sh """
+        set +x
+        echo "\033[0;32m===> \033[0;34mChecking the information of our deployed chart\033[0;32m <=== \033[0m"
+        /usr/local/bin/helm ls --deployed $chart_name --output yaml
+        """
+      }
+    }
+  }
+  stage("Choose environment") {
+    steps {
+      script{
+        environment = input message: 'Choose namespace!', parameters: [choice(name: 'namespace', choices: "development\nproduction", description: '')]
+      }
+    }
+  }
+  stage("Choose version") {
+    steps {
+      script {
+        def version_collection
+        version_collection = sh (script: "/usr/local/bin/helm search --versions $chart_name | awk '{if (NR!=1) {print \$2}}'", returnStdout: true).trim()
+        version = input message: 'Choose version!', parameters: [choice(name: 'version', choices: "${version_collection}", description: '')]
+      }   
+    }
+  }
+  stage("List of values") {
+    steps {
+      script{
+        sh """
+        set +x
+        tmp_dir=\$(mktemp -d -t chart-XXXXXXXXXX)
+        echo "\033[0;32m===> \033[0;34mDownloading $environment-values.yaml from a repository to the local filesystem\033[0;32m <=== \033[0m"
+        /usr/local/bin/helm fetch chartmuseum/$chart_name --untar --untardir ${'$'}tmp_dir --version $version && cat ${'$'}tmp_dir/$chart_name/$environment-values.yaml
+        rm -rf ${'$'}tmp_dir
+        """
+      }
+    }
+  }
+  stage("Deploy chart") {
+    steps {
+      script{
+        chart_args = input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: 'none', description: 'Any values to overwrite?')]
+        sh """
+        set +x
+        echo "\033[0;32m===> \033[0;34mDeploying helm chart\033[0;32m <=== \033[0m"
+        if [[ $chart_args = "none" ]]
+        then
+          /usr/local/bin/helm upgrade --install $chart_name-$environment --namespace $environment chartmuseum/$chart_name --dry-run
+        else
+          /usr/local/bin/helm upgrade --install $chart_name-$environment --set-string $chart_args --namespace $environment chartmuseum/$chart_name --dry-run
+        fi
+        """
+      }
+    }
+  }
+  stage("Get status") {
+    steps {
+      script{
+        sh """
+        set +x
+        echo "\033[0;32m===> \033[0;34mChecking status of helm chart\033[0;32m <=== \033[0m"
+        /usr/local/bin/helm ls --deployed $chart_name --namespace $environment --output yaml
         """
         }
       }
