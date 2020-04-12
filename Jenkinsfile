@@ -107,7 +107,7 @@ stages {
         echo "\033[0;32m===> \033[0;34mDeploying helm chart\033[0;32m <=== \033[0m"
         if [[ $chart_args = "none" ]]
         then
-          /usr/local/bin/helm upgrade --install $chart_name-$environment --namespace $environment -f $tmp_dir/$chart_name/$environment-values.yaml chartmuseum/$chart_name --dry-run
+          /usr/local/bin/helm upgrade --install $chart_name-$environment --namespace $environment -f ${'$'}tmp_dir/$chart_name/$environment-values.yaml chartmuseum/$chart_name --dry-run
         else
           /usr/local/bin/helm upgrade --install $chart_name-$environment --set-string $chart_args --namespace $environment chartmuseum/$chart_name --dry-run
         fi
