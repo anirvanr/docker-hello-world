@@ -6,6 +6,7 @@ def version
 def environment
 def chart_args
 def chart_name
+def tmp_dir
 
 
 pipeline {
@@ -92,7 +93,6 @@ stages {
         tmp_dir=\$(mktemp -d -t chart-XXXXXXXXXX)
         echo "\033[0;32m===> \033[0;34mDownloading $environment-values.yaml from a repository to the local filesystem\033[0;32m <=== \033[0m"
         /usr/local/bin/helm fetch chartmuseum/$chart_name --untar --untardir ${'$'}tmp_dir --version $version && cat ${'$'}tmp_dir/$chart_name/$environment-values.yaml
-        rm -rf ${'$'}tmp_dir
         """
       }
     }
@@ -104,11 +104,10 @@ stages {
         chart_args = input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: 'none', description: 'Any values to overwrite?')]
         }
         sh """
-        set +x
         echo "\033[0;32m===> \033[0;34mDeploying helm chart\033[0;32m <=== \033[0m"
         if [[ $chart_args = "none" ]]
         then
-          /usr/local/bin/helm upgrade --install $chart_name-$environment --namespace $environment chartmuseum/$chart_name --dry-run
+          /usr/local/bin/helm upgrade --install $chart_name-$environment --namespace $environment -f $tmp_dir/$chart_name/$environment-values.yaml chartmuseum/$chart_name --dry-run
         else
           /usr/local/bin/helm upgrade --install $chart_name-$environment --set-string $chart_args --namespace $environment chartmuseum/$chart_name --dry-run
         fi
