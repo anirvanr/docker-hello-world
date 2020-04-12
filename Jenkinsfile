@@ -23,7 +23,8 @@ pipeline {
 
 stages {
   stage("Parameterizing") {
-    steps {
+    steps { when { branch "master" }
+        }
         script {
           if ("${params.dryrun}" == "Yes") {
           currentBuild.result = 'ABORTED'
@@ -33,86 +34,88 @@ stages {
     }
   }
   stage("Update repo") {
-    steps {
-      script{
+    steps { when { branch "master" }
+      script {
         sh """
         set +x
         echo "\033[0;32m===> \033[0;34mUpdating helm client repository information\033[0;32m <=== \033[0m"
         /usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon
         /usr/local/bin/helm repo update chartmuseum
         """
-        }
       }
     }
+  }
   stage("Choose chart") {
-    steps {
+    steps { when { branch "master" }
       script{
         chosen_chart = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}' | awk -F/ '{print \$2}'", returnStdout: true).trim()
         chart_name = input message: 'Choose chart!', parameters: [choice(name: 'charts', choices:"${chosen_chart}", description: "Which Chart do you want to deploy?")]
-        }
       }
     }
+  }
   stage("View installed charts") {
-    steps {
+    steps { when { branch "master" }
       script{
         sh """
         set +x
-        echo "\033[0;32m===> \033[0;34mCheck the information of our deployed chart\033[0;32m <=== \033[0m"
+        echo "\033[0;32m===> \033[0;34mChecking the information of our deployed chart\033[0;32m <=== \033[0m"
         /usr/local/bin/helm ls --deployed $chart_name --output yaml
         """
-        }
       }
     }
+  }
   stage("Choose environment") {
-    steps {
+    steps { when { branch "master" }
       script{
         environment = input message: 'Choose namespace!', parameters: [choice(name: 'namespace', choices: "development\nproduction", description: '')]
-        }
       }
     }
+  }
   stage("Choose version") {
-    steps {
-        script {
-          def version_collection
-          version_collection = sh (script: "/usr/local/bin/helm search --versions $chart_name | awk '{if (NR!=1) {print \$2}}'", returnStdout: true).trim()
-          version = input message: 'Choose version!', parameters: [choice(name: 'version', choices: "${version_collection}", description: '')]
-        }   
-      }
+    steps { when { branch "master" }
+      script {
+        def version_collection
+        version_collection = sh (script: "/usr/local/bin/helm search --versions $chart_name | awk '{if (NR!=1) {print \$2}}'", returnStdout: true).trim()
+        version = input message: 'Choose version!', parameters: [choice(name: 'version', choices: "${version_collection}", description: '')]
+      }   
     }
+  }
   stage("List of values") {
-    steps {
+    steps { when { branch "master" }
       script{
         sh """
         set +x
+        tmp_dir=$(mktemp -d -t chart-XXXXXXXXXX)
         echo "\033[0;32m===> \033[0;34mDownloading $environment-values.yaml from a repository to the local filesystem\033[0;32m <=== \033[0m"
-        /usr/local/bin/helm fetch chartmuseum/$chart_name --untar --untardir /tmp/charts --version $version && cat /tmp/charts/$chart_name/$environment-values.yaml
+        /usr/local/bin/helm fetch chartmuseum/$chart_name --untar --untardir $tmp_dir --version $version && cat $tmp_dir/$chart_name/$environment-values.yaml
+        rm -rf $tmp_dir
         """
-        }
       }
     }
+  }
   stage("Deploy chart") {
-    steps {
+    steps { when { branch "master" }
       script{
-      chart_args = input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: 'none', description: 'Any values to overwrite?')]
-      sh """
-      set +x
-      echo "\033[0;32m===> \033[0;34mDeploy helm chart\033[0;32m <=== \033[0m"
-      if [[ $chart_args = "none" ]]
+        chart_args = input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: 'none', description: 'Any values to overwrite?')]
+        sh """
+        set +x
+        echo "\033[0;32m===> \033[0;34mDeploying helm chart\033[0;32m <=== \033[0m"
+        if [[ $chart_args = "none" ]]
         then
-            /usr/local/bin/helm upgrade --install $chart_name-$environment --namespace $environment chartmuseum/$chart_name --dry-run
+          /usr/local/bin/helm upgrade --install $chart_name-$environment --namespace $environment chartmuseum/$chart_name --dry-run
         else
           /usr/local/bin/helm upgrade --install $chart_name-$environment --set-string $chart_args --namespace $environment chartmuseum/$chart_name --dry-run
-      fi
-      """
+        fi
+        """
       }
     }
   }
   stage("Get status") {
-    steps {
+    steps { when { branch "master" }
       script{
         sh """
         set +x
-        echo "\033[0;32m===> \033[0;34mCheck status of helm chart\033[0;32m <=== \033[0m"
+        echo "\033[0;32m===> \033[0;34mChecking status of helm chart\033[0;32m <=== \033[0m"
         /usr/local/bin/helm ls --deployed $chart_name --namespace $environment --output yaml
         """
         }
