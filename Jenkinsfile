@@ -87,7 +87,7 @@ stages {
   stage("List of values") {
     steps {
       script{
-        // env.tmp_dir = sh(script: 'mktemp -d -t chart-XXXXXXXXXX', , returnStdout: true).trim()
+        env.tmp_dir = sh(script: 'mktemp -d -t chart-XXXXX', , returnStdout: true).trim()
         sh """
         set +x
         echo "\033[0;32m===> \033[0;34mDownloading $environment-values.yaml from a repository to the local filesystem\033[0;32m <=== \033[0m"
