@@ -17,7 +17,7 @@ pipeline {
   }
   
   parameters {
-    choice(name: 'Start ', choices:"No\nYes", description: "Let's start!" )
+    choice(name: 'Start ', choices:"No\nYes", description: "What do you want to do?" )
   }
 
 stages {
