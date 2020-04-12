@@ -14,7 +14,6 @@ node {
   /usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon
   /usr/local/bin/helm repo update chartmuseum
   """
-  chartname = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}' | awk -F/ '{print \$2}'", returnStdout: true).trim()
 }
 
 pipeline {
@@ -45,6 +44,7 @@ stages {
   stage("choose chart") {
     steps {
       script{
+        chartname = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}' | awk -F/ '{print \$2}'", returnStdout: true).trim()
         deployment_name = input message: 'Choose chart!', parameters: [choice(name: 'charts', choices:"${chartname}", description: "Which Chart do you want to deploy?")]
         }
       }
