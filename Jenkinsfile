@@ -4,8 +4,8 @@
 def charts
 def version
 def environment
-def deploy_args
-def deployment_name
+def chart_args
+def chart_name
 
 
 pipeline {
@@ -14,16 +14,15 @@ pipeline {
   options {
     timeout(time: 60, unit: 'MINUTES')
     ansiColor('xterm')
-    buildDiscarder(logRotator(numToKeepStr: '5'))
+    buildDiscarder(logRotator(numToKeepStr: '10'))
   }
   
   parameters {
-          choice(name: 'dryrun', choices:"Yes\nNo", description: "Do you whish to do a dry run?" )
-          // choice(name: 'charts', choices:"${chartname}", description: "Which Chart do you want to deploy?")
+    choice(name: 'dryrun', choices:"Yes\nNo", description: "Do you whish to do a dry run?" )
   }
 
 stages {
-  stage("parameterizing") {
+  stage("Parameterizing") {
     steps {
         script {
           if ("${params.dryrun}" == "Yes") {
@@ -45,76 +44,76 @@ stages {
         }
       }
     }
-  stage("choose chart") {
+  stage("Choose chart") {
     steps {
       script{
-        chartname = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}' | awk -F/ '{print \$2}'", returnStdout: true).trim()
-        deployment_name = input message: 'Choose chart!', parameters: [choice(name: 'charts', choices:"${chartname}", description: "Which Chart do you want to deploy?")]
+        chosen_chart = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}' | awk -F/ '{print \$2}'", returnStdout: true).trim()
+        chart_name = input message: 'Choose chart!', parameters: [choice(name: 'charts', choices:"${chosen_chart}", description: "Which Chart do you want to deploy?")]
         }
       }
     }
-  stage("installed charts") {
+  stage("View installed charts") {
     steps {
       script{
         sh """
         set +x
         echo "\033[0;34m Check the information of our deployed chart \033[0m"
-        /usr/local/bin/helm ls --deployed $deployment_name --output yaml
+        /usr/local/bin/helm ls --deployed $chart_name --output yaml
         """
         }
       }
     }
-  stage("choose env") {
+  stage("Choose environment") {
     steps {
       script{
         environment = input message: 'Choose namespace!', parameters: [choice(name: 'namespace', choices: "development\nproduction", description: '')]
         }
       }
     }
-  stage("choose version") {
+  stage("Choose version") {
     steps {
         script {
           def version_collection
-          version_collection = sh (script: "/usr/local/bin/helm search --versions $deployment_name | awk '{if (NR!=1) {print \$2}}'", returnStdout: true).trim()
+          version_collection = sh (script: "/usr/local/bin/helm search --versions $chart_name | awk '{if (NR!=1) {print \$2}}'", returnStdout: true).trim()
           version = input message: 'Choose version!', parameters: [choice(name: 'version', choices: "${version_collection}", description: '')]
         }   
       }
     }
-  stage("list values") {
+  stage("List of values") {
     steps {
       script{
         sh """
         set +x
-        echo "\033[0;34m Fetch a reference $environment-values.yaml \033[0m"
-        /usr/local/bin/helm fetch chartmuseum/$deployment_name --untar --untardir /tmp/charts --version $version && cat /tmp/charts/$deployment_name/$environment-values.yaml
+        echo "\033[0;34m Downloading $environment-values.yaml from a repository to the local filesystem \033[0m"
+        /usr/local/bin/helm fetch chartmuseum/$chart_name --untar --untardir /tmp/charts --version $version && cat /tmp/charts/$chart_name/$environment-values.yaml
         """
         }
       }
     }
-  stage("deploy") {
+  stage("Deploy chart") {
     steps {
       script{
-      deploy_args = input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: 'none', description: 'Any values to overwrite?')]
+      chart_args = input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: 'none', description: 'Any values to overwrite?')]
       sh """
       set +x
-      echo "\033[0;34m Installing the $deployment_name Helm Chart \033[0m"
-      if [[ $deploy_args = "none" ]]
+      echo "\033[0;34m Deploy helm chart \033[0m"
+      if [[ $chart_args = "none" ]]
         then
-            /usr/local/bin/helm upgrade --install $deployment_name-$environment --namespace $environment chartmuseum/$deployment_name --dry-run
+            /usr/local/bin/helm upgrade --install $chart_name-$environment --namespace $environment chartmuseum/$chart_name --dry-run
         else
-          /usr/local/bin/helm upgrade --install $deployment_name-$environment --set-string $deploy_args --namespace $environment chartmuseum/$deployment_name --dry-run
+          /usr/local/bin/helm upgrade --install $chart_name-$environment --set-string $chart_args --namespace $environment chartmuseum/$chart_name --dry-run
       fi
       """
       }
     }
   }
-  stage("status") {
+  stage("Get status") {
     steps {
       script{
         sh """
         set +x
-        echo "\033[0;34m check status of deployment \033[0m"
-        /usr/local/bin/helm ls --deployed $deployment_name --namespace $environment --output yaml
+        echo "\033[0;34m Check status of helm chart \033[0m"
+        /usr/local/bin/helm ls --deployed $chart_name --namespace $environment --output yaml
         """
         }
       }
