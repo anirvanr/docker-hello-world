@@ -27,10 +27,10 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr: '5'))
   }
   
-input message: 'Choose chart!', parameters {
-          choice(name: 'dryrun', choices:"Yes\nNo", description: "Do you whish to do a dry run?" )
-          choice(name: 'charts', choices:"${chartname}", description: "Which Chart do you want to deploy?")
-  }
+def userInput = input( id: 'userInput', message: 'Choose chart!', parameters [
+          [choice(name: 'dryrun', choices:"Yes\nNo", description: "Do you whish to do a dry run?" )]
+          [choice(name: 'charts', choices:"${chartname}", description: "Which Chart do you want to deploy?")]
+])
 
 stages {
   stage("parameterizing") {
