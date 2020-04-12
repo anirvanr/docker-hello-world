@@ -26,6 +26,7 @@ stages {
         script {
           if ("${params['Start ']}" == "No") {
           currentBuild.result = 'ABORTED'
+          error('Aborting the build.')
         }
       }
     }
