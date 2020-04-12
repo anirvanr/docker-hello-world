@@ -26,7 +26,6 @@ stages {
         script {
           if ("${params['Start ']}" == "No") {
           currentBuild.result = 'ABORTED'
-          error('DRY RUN COMPLETED. JOB PARAMETERIZED.')
         }
       }
     }
