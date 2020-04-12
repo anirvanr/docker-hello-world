@@ -5,7 +5,7 @@ def charts
 def version
 def environment
 def deploy_args
-def deployment_name = params.charts
+def deployment_name
 
 node {  
   sh """
@@ -22,7 +22,6 @@ pipeline {
 
   options {
     timeout(time: 60, unit: 'MINUTES')
-    timestamps()
     ansiColor('xterm')
     buildDiscarder(logRotator(numToKeepStr: '5'))
   }
