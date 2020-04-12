@@ -1,12 +1,10 @@
 #!groovy
 
-// Define variables (based on parameters set in a Jenkins job)
 def charts
 def version
 def environment
 def chart_args
 def chart_name
-
 
 pipeline {
   agent any
@@ -48,7 +46,7 @@ stages {
       script{
         chosen_chart = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}' | awk -F/ '{print \$2}'", returnStdout: true).trim()
         timeout(time: 1, unit: "MINUTES") {
-        chart_name = input message: 'Choose chart!', parameters: [choice(name: 'charts', choices:"${chosen_chart}", description: "Which Chart do you want to deploy?")]
+        chart_name = input message: 'Choose chart!', parameters: [choice(name: 'charts', choices:"${chosen_chart}", description: "Which chart do you want to deploy?")]
         }
       }
     }
@@ -59,7 +57,7 @@ stages {
         sh """
         set +x
         echo "\033[0;32m===> \033[0;34mChecking the information of our deployed chart\033[0;32m <=== \033[0m"
-        /usr/local/bin/helm ls --deployed $chart_name --output yaml
+        /usr/local/bin/helm ls --deployed $chart_name --output json | jq -r .Releases[]
         """
       }
     }
