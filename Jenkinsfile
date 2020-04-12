@@ -24,7 +24,6 @@ pipeline {
 stages {
   stage("Parameterizing") {
     steps { when { branch "master" }
-        }
         script {
           if ("${params.dryrun}" == "Yes") {
           currentBuild.result = 'ABORTED'
