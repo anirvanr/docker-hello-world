@@ -57,7 +57,8 @@ stages {
         sh """
         set +x
         echo "\033[0;32m===> \033[0;34mChecking the information of our deployed chart\033[0;32m <=== \033[0m"
-        echo "\033[0;35m \$(/usr/local/bin/helm ls --deployed $chart_name --output json | jq -r .Releases[] | sed 's/{//g;s/}//g;s/"//g;s/,//g;s/^[ \t]*//g' | cat -s)\033[0m"
+        echo "\033[0;35m \$(/usr/local/bin/helm ls --deployed $chart_name --output json | \
+        jq -r .Releases[] | sed 's/{//g;s/}//g;s/"//g;s/,//g;s/^[ \t]*//g' | cat -s)\033[0m"
         """
       }
     }
@@ -121,7 +122,8 @@ stages {
         sh """
         set +x
         echo "\033[0;32m===> \033[0;34mChecking status of helm chart\033[0;32m <=== \033[0m"
-        echo "\033[0;35m \$(/usr/local/bin/helm ls --deployed $chart_name --namespace $environment --output json | jq -r .Releases[] | sed 's/{//g;s/}//g;s/"//g;s/,//g;s/^[ \t]*//g | cat -s')\033[0m"
+        echo "\033[0;35m \$(/usr/local/bin/helm ls --deployed $chart_name --namespace $environment --output json | \
+        jq -r .Releases[] | sed 's/{//g;s/}//g;s/"//g;s/,//g;s/^[ \t]*//g' | cat -s)\033[0m"
         """
         }
       }
