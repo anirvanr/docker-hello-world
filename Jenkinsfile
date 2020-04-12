@@ -7,14 +7,6 @@ def environment
 def deploy_args
 def deployment_name
 
-node {  
-  sh """
-  set +x
-  echo "\033[0;34m Updating helm client repository information \033[0m"
-  /usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon
-  /usr/local/bin/helm repo update chartmuseum
-  """
-}
 
 pipeline {
   agent any
@@ -41,6 +33,18 @@ stages {
       }
     }
   }
+  stage("Update repo") {
+    steps {
+      script{
+        sh """
+        set +x
+        echo "\033[0;34m Updating helm client repository information \033[0m"
+        /usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon
+        /usr/local/bin/helm repo update chartmuseum
+        """
+        }
+      }
+    }
   stage("choose chart") {
     steps {
       script{
