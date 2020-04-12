@@ -23,7 +23,7 @@ pipeline {
 
 stages {
   stage("Parameterizing") {
-    steps { when { branch "master" }
+    steps {
         script {
           if ("${params.dryrun}" == "Yes") {
           currentBuild.result = 'ABORTED'
@@ -33,8 +33,8 @@ stages {
     }
   }
   stage("Update repo") {
-    steps { when { branch "master" }
-      script {
+    steps {
+      script{
         sh """
         set +x
         echo "\033[0;32m===> \033[0;34mUpdating helm client repository information\033[0;32m <=== \033[0m"
@@ -45,7 +45,7 @@ stages {
     }
   }
   stage("Choose chart") {
-    steps { when { branch "master" }
+    steps {
       script{
         chosen_chart = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}' | awk -F/ '{print \$2}'", returnStdout: true).trim()
         chart_name = input message: 'Choose chart!', parameters: [choice(name: 'charts', choices:"${chosen_chart}", description: "Which Chart do you want to deploy?")]
@@ -53,7 +53,7 @@ stages {
     }
   }
   stage("View installed charts") {
-    steps { when { branch "master" }
+    steps {
       script{
         sh """
         set +x
@@ -64,14 +64,14 @@ stages {
     }
   }
   stage("Choose environment") {
-    steps { when { branch "master" }
+    steps {
       script{
         environment = input message: 'Choose namespace!', parameters: [choice(name: 'namespace', choices: "development\nproduction", description: '')]
       }
     }
   }
   stage("Choose version") {
-    steps { when { branch "master" }
+    steps {
       script {
         def version_collection
         version_collection = sh (script: "/usr/local/bin/helm search --versions $chart_name | awk '{if (NR!=1) {print \$2}}'", returnStdout: true).trim()
@@ -80,7 +80,7 @@ stages {
     }
   }
   stage("List of values") {
-    steps { when { branch "master" }
+    steps {
       script{
         sh """
         set +x
@@ -93,7 +93,7 @@ stages {
     }
   }
   stage("Deploy chart") {
-    steps { when { branch "master" }
+    steps {
       script{
         chart_args = input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: 'none', description: 'Any values to overwrite?')]
         sh """
@@ -110,7 +110,7 @@ stages {
     }
   }
   stage("Get status") {
-    steps { when { branch "master" }
+    steps {
       script{
         sh """
         set +x
