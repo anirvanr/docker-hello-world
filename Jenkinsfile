@@ -35,7 +35,7 @@ stages {
   }
   stage("Update repo") {
     steps {
-      info(helm client repository information updating)
+      info("Updating helm client repository information")
       script{
         sh """
         set +x
