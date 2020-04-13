@@ -8,8 +8,8 @@ def chart_name
 def info(message) {
     sh "set +x ; echo '\033[0;32m===> \033[0;34m${message}\033[0;32m <===\033[0m'"
 }
-def console(message) {
-    sh "set +x ; echo '\033[0;32m===> \033[0;34m${message}\033[0;32m <===\033[0m'"
+def console(command) {
+    sh "set +x ; echo '\033[0;35m${command}\033[0m'"
 }
 
 pipeline {
@@ -38,10 +38,10 @@ stages {
   stage("Update repo") {
     steps {
       info ("Updating helm client repository information")
+      console ("/usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon")
       script{
         sh """
         set +x
-        /usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon
         echo "\033[0;35m \$(/usr/local/bin/helm repo update chartmuseum)\033[0m"
         """
       }
