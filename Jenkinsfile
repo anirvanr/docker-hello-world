@@ -36,7 +36,7 @@ stages {
         set +x
         echo "\033[0;32m===> \033[0;34mUpdating helm client repository information\033[0;32m <=== \033[0m"
         /usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon
-        /usr/local/bin/helm repo update chartmuseum
+        echo "\033[0;35m \$(/usr/local/bin/helm repo update chartmuseum)\033[0m"
         """
       }
     }
