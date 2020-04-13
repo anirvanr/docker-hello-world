@@ -38,7 +38,7 @@ stages {
       script{
         sh """
         set +x
-        echo "\033[0;35m \$(/usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon \
+        echo "\033[0;35m\$(/usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon \
         && /usr/local/bin/helm repo update chartmuseum)\033[0m"
         """
       }
@@ -62,7 +62,7 @@ stages {
       script{
         sh """
         set +x
-        echo "\033[0;35m \$(/usr/local/bin/helm ls --deployed $chart_name --output json | \
+        echo "\033[0;35m\$(/usr/local/bin/helm ls --deployed $chart_name --output json | \
         jq -r .Releases[] | sed 's/{//g;s/}//g;s/"//g;s/,//g;s/^[ \t]*//g' | cat -s)\033[0m"
         """
       }
@@ -94,11 +94,11 @@ stages {
     steps {
       info ("Downloading $environment-values.yaml from a repository to the local filesystem")
       script{
-        env.tmp_dir = sh(script: 'mktemp -d -t chart-XXXXX', , returnStdout: true).trim()
+        env.tmp_dir = sh(script: 'set +x ; mktemp -d -t chart-XXXXX', , returnStdout: true).trim()
         sh """
         set +x
         /usr/local/bin/helm fetch chartmuseum/$chart_name --untar --untardir $tmp_dir --version $version
-        echo "\033[0;35m \$(<$tmp_dir/$chart_name/$environment-values.yaml)\033[0m"
+        echo "\033[0;35m\$(<$tmp_dir/$chart_name/$environment-values.yaml)\033[0m"
         """
       }
     }
@@ -115,10 +115,10 @@ stages {
         set +x
         if [[ $chart_args = "none" ]]
         then
-          echo "\033[0;35m \$(/usr/local/bin/helm upgrade --install $chart_name-$environment --namespace \
+          echo "\033[0;35m\$(/usr/local/bin/helm upgrade --install $chart_name-$environment --namespace \
           $environment -f $tmp_dir/$chart_name/$environment-values.yaml chartmuseum/$chart_name --dry-run)\033[0m"
         else
-          echo "\033[0;35m \$(/usr/local/bin/helm upgrade --install $chart_name-$environment --set $chart_args \
+          echo "\033[0;35m\$(/usr/local/bin/helm upgrade --install $chart_name-$environment --set $chart_args \
           --namespace $environment -f $tmp_dir/$chart_name/$environment-values.yaml chartmuseum/$chart_name --dry-run)\033[0m"
         fi
         rm -rf $tmp_dir
