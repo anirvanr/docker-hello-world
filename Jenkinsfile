@@ -8,9 +8,6 @@ def chart_name
 def info(message) {
     sh "set +x ; echo '\033[0;32m===> \033[0;34m${message}\033[0;32m <===\033[0m'"
 }
-def console(command) {
-    sh "set +x ; echo '\033[0;35m${command}\033[0m'"
-}
 
 pipeline {
   agent any
@@ -38,11 +35,11 @@ stages {
   stage("Update repo") {
     steps {
       info ("Updating helm client repository information")
-      console (/usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon)
       script{
         sh """
         set +x
-        echo "\033[0;35m \$(/usr/local/bin/helm repo update chartmuseum)\033[0m"
+        echo "\033[0;35m \$(/usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon \
+        && /usr/local/bin/helm repo update chartmuseum)\033[0m"
         """
       }
     }
@@ -121,8 +118,8 @@ stages {
           /usr/local/bin/helm upgrade --install $chart_name-$environment --namespace \
           $environment -f $tmp_dir/$chart_name/$environment-values.yaml chartmuseum/$chart_name --dry-run
         else
-          /usr/local/bin/helm upgrade --install $chart_name-$environment --set-string \
-          $chart_args --namespace $environment -f $tmp_dir/$chart_name/$environment-values.yaml chartmuseum/$chart_name --dry-run
+          /usr/local/bin/helm upgrade --install $chart_name-$environment --set-string $chart_args \
+          --namespace $environment -f $tmp_dir/$chart_name/$environment-values.yaml chartmuseum/$chart_name --dry-run
         fi
         rm -rf $tmp_dir
         """
