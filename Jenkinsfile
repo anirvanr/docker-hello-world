@@ -38,7 +38,7 @@ stages {
   stage("Update repo") {
     steps {
       info ("Updating helm client repository information")
-      console ("/usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon")
+      console (/usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon)
       script{
         sh """
         set +x
