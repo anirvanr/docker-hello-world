@@ -44,9 +44,11 @@ stages {
   stage("Choose chart") {
     steps {
       script{
-        chosen_chart = sh (script: "/usr/local/bin/helm search chartmuseum/ | awk '{if (NR!=1) {print \$1}}' | awk -F/ '{print \$2}'", returnStdout: true).trim()
+        chosen_chart = sh (script: "/usr/local/bin/helm search chartmuseum/ | \
+        awk '{if (NR!=1) {print \$1}}' | awk -F/ '{print \$2}'", returnStdout: true).trim()
         timeout(time: 1, unit: "MINUTES") {
-        chart_name = input message: 'Choose chart!', parameters: [choice(name: 'charts', choices:"${chosen_chart}", description: "Which chart do you want to deploy?")]
+        chart_name = input message: 'Choose chart!', parameters:
+        [choice(name: 'charts', choices:"${chosen_chart}", description: "Which chart do you want to deploy?")]
         }
       }
     }
@@ -67,7 +69,8 @@ stages {
     steps {
       script{
         timeout(time: 1, unit: "MINUTES") {
-        environment = input message: 'Choose namespace!', parameters: [choice(name: 'namespace', choices: "development\nproduction", description: '')]
+        environment = input message: 'Choose namespace!', parameters:
+        [choice(name: 'namespace', choices: "development\nproduction", description: '')]
         }
       }
     }
@@ -76,7 +79,8 @@ stages {
     steps {
       script {
         def version_collection
-        version_collection = sh (script: "/usr/local/bin/helm search --versions $chart_name | awk '{if (NR!=1) {print \$2}}'", returnStdout: true).trim()
+        version_collection = sh (script: "/usr/local/bin/helm search --versions \
+        $chart_name | awk '{if (NR!=1) {print \$2}}'", returnStdout: true).trim()
         timeout(time: 1, unit: "MINUTES") {
         version = input message: 'Choose version!', parameters: [choice(name: 'version', choices: "${version_collection}", description: '')]
         }
@@ -100,16 +104,19 @@ stages {
     steps {
       script{
         timeout(time: 10, unit: "MINUTES") {
-        chart_args = input message: 'Choose values!', parameters: [string(name: 'values', defaultValue: 'none', description: 'Any values to overwrite?')]
+        chart_args = input message: 'Choose values!', parameters: 
+        [string(name: 'values', defaultValue: 'none', description: 'Any values to overwrite?')]
         }
         sh """
         set +x
         echo "\033[0;32m===> \033[0;34mDeploying helm chart\033[0;32m <=== \033[0m"
         if [[ $chart_args = "none" ]]
         then
-          /usr/local/bin/helm upgrade --install $chart_name-$environment --namespace $environment -f $tmp_dir/$chart_name/$environment-values.yaml chartmuseum/$chart_name --dry-run
+          /usr/local/bin/helm upgrade --install $chart_name-$environment --namespace \
+          $environment -f $tmp_dir/$chart_name/$environment-values.yaml chartmuseum/$chart_name --dry-run
         else
-          /usr/local/bin/helm upgrade --install $chart_name-$environment --set-string $chart_args --namespace $environment -f $tmp_dir/$chart_name/$environment-values.yaml chartmuseum/$chart_name --dry-run
+          /usr/local/bin/helm upgrade --install $chart_name-$environment --set-string \
+          $chart_args --namespace $environment -f $tmp_dir/$chart_name/$environment-values.yaml chartmuseum/$chart_name --dry-run
         fi
         rm -rf $tmp_dir
         """
