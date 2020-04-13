@@ -6,7 +6,7 @@ def environment
 def chart_args
 def chart_name
 def info(message) {
-    sh "{ set +x; } 2>/dev/null ; echo '\033[0;32m===> \033[0;34m${message}\033[0;32m <===\033[0m'"
+    sh "#!/bin/sh -e; echo '\033[0;32m===> \033[0;34m${message}\033[0;32m <===\033[0m'"
 }
 
 
