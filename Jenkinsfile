@@ -5,6 +5,10 @@ def version
 def environment
 def chart_args
 def chart_name
+def info(message) {
+    echo "\033[0;32m===> \033[0;34m${message}\033[0;32m <===\033[0m"
+}
+
 
 pipeline {
   agent any
@@ -34,7 +38,7 @@ stages {
       script{
         sh """
         set +x
-        echo "\033[0;32m===> \033[0;34mUpdating helm client repository information\033[0;32m <=== \033[0m"
+        info(Updating helm client repository information)
         /usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon
         echo "\033[0;35m \$(/usr/local/bin/helm repo update chartmuseum)\033[0m"
         """
