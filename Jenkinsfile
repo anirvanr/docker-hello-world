@@ -6,9 +6,11 @@ def environment
 def chart_args
 def chart_name
 def info(message) {
-    sh "#!/bin/sh -e; echo '\033[0;32m===> \033[0;34m${message}\033[0;32m <===\033[0m'"
+    sh "set +x ; echo '\033[0;32m===> \033[0;34m${message}\033[0;32m <===\033[0m'"
 }
-
+def console(message) {
+    sh "set +x ; echo '\033[0;32m===> \033[0;34m${message}\033[0;32m <===\033[0m'"
+}
 
 pipeline {
   agent any
