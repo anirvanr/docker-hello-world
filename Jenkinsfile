@@ -6,7 +6,7 @@ def environment
 def chart_args
 def chart_name
 def info(message) {
-    echo "\033[0;32m===> \033[0;34m${message}\033[0;32m <===\033[0m"
+    sh 'echo "\033[0;32m===> \033[0;34m${message}\033[0;32m <===\033[0m"'
 }
 
 
@@ -35,10 +35,10 @@ stages {
   }
   stage("Update repo") {
     steps {
+      info(Updating helm client repository information)
       script{
         sh """
         set +x
-        info(Updating helm client repository information)
         /usr/local/bin/helm repo add chartmuseum https://chartmuseum.dynacommercelab.com/techm/megafon
         echo "\033[0;35m \$(/usr/local/bin/helm repo update chartmuseum)\033[0m"
         """
