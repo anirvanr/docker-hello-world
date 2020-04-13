@@ -6,7 +6,7 @@ def environment
 def chart_args
 def chart_name
 def info(message) {
-    sh "set =x ; echo '\033[0;32m===> \033[0;34m${message}\033[0;32m <===\033[0m'"
+    sh "set +x ; echo '\033[0;32m===> \033[0;34m${message}\033[0;32m <===\033[0m'"
 }
 
 
@@ -35,7 +35,7 @@ stages {
   }
   stage("Update repo") {
     steps {
-      info("Updating helm client repository information")
+      info ("Updating helm client repository information")
       script{
         sh """
         set +x
@@ -59,10 +59,10 @@ stages {
   }
   stage("View installed charts") {
     steps {
+      info ("Checking the information of our deployed chart")
       script{
         sh """
         set +x
-        echo "\033[0;32m===> \033[0;34mChecking the information of our deployed chart\033[0;32m <=== \033[0m"
         echo "\033[0;35m \$(/usr/local/bin/helm ls --deployed $chart_name --output json | \
         jq -r .Releases[] | sed 's/{//g;s/}//g;s/"//g;s/,//g;s/^[ \t]*//g' | cat -s)\033[0m"
         """
@@ -93,11 +93,11 @@ stages {
   }
   stage("List of values") {
     steps {
+      info ("Downloading $environment-values.yaml from a repository to the local filesystem")
       script{
         env.tmp_dir = sh(script: 'mktemp -d -t chart-XXXXX', , returnStdout: true).trim()
         sh """
         set +x
-        echo "\033[0;32m===> \033[0;34mDownloading $environment-values.yaml from a repository to the local filesystem\033[0;32m <=== \033[0m"
         /usr/local/bin/helm fetch chartmuseum/$chart_name --untar --untardir $tmp_dir --version $version
         echo "\033[0;35m \$(<$tmp_dir/$chart_name/$environment-values.yaml)\033[0m"
         """
@@ -111,9 +111,9 @@ stages {
         chart_args = input message: 'Choose values!', parameters: 
         [string(name: 'values', defaultValue: 'none', description: 'Any values to overwrite?')]
         }
+        info ("Deploying helm chart")
         sh """
         set +x
-        echo "\033[0;32m===> \033[0;34mDeploying helm chart\033[0;32m <=== \033[0m"
         if [[ $chart_args = "none" ]]
         then
           /usr/local/bin/helm upgrade --install $chart_name-$environment --namespace \
@@ -129,10 +129,10 @@ stages {
   }
   stage("Get status") {
     steps {
+      info ("Checking status of helm chart")
       script{
         sh """
         set +x
-        echo "\033[0;32m===> \033[0;34mChecking status of helm chart\033[0;32m <=== \033[0m"
         echo "\033[0;35m \$(/usr/local/bin/helm ls --deployed $chart_name --namespace $environment --output json | \
         jq -r .Releases[] | sed 's/{//g;s/}//g;s/"//g;s/,//g;s/^[ \t]*//g' | cat -s)\033[0m"
         """
