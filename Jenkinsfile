@@ -39,7 +39,8 @@ stages {
         sh """
         set +x
         echo "\033[0;35m\$(/usr/local/bin/helm repo add chartmuseum \
-        https://chartmuseum.dynacommercelab.com/techm/megafon && /usr/local/bin/helm repo update chartmuseum)\033[0m"
+        https://chartmuseum.dynacommercelab.com/techm/megafon && \
+        /usr/local/bin/helm repo update chartmuseum)\033[0m"
         """
       }
     }
@@ -102,7 +103,7 @@ stages {
         set +x
         /usr/local/bin/helm fetch chartmuseum/$chart_name --untar --untardir $tmp_dir --version $version
         """
-        def status_code = sh(script: "set +x ; echo -e '\033[0;35-----\033[0m' ; cat $tmp_dir/$chart_name/$environment-values.yaml", returnStatus: true)
+        def status_code = sh(script: "set +x ; cat $tmp_dir/$chart_name/$environment-values.yaml", returnStatus: true)
         if ( status_code != 0 ) {
           currentBuild.result = 'FAILED'
             error('The script failed')
