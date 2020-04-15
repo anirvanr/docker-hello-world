@@ -96,11 +96,12 @@ stages {
       info ("Downloading $environment-values.yaml from a repository to the local filesystem")
       script{
         env.tmp_dir = sh(script: 'set +x ; mktemp -d -t chart-XXXXX', , returnStdout: true).trim()
-        def statusCode = sh """
+        def statusCode = sh(script: 
+        """
         set +x
         /usr/local/bin/helm fetch chartmuseum/$chart_name --untar --untardir $tmp_dir --version $version
         echo "\033[0;35m\$(<$tmp_dir/$chart_name/$environment-values.yaml)\033[0m"
-        """
+        """), returnStatus:true
         echo "$statusCode"
       }
     }
