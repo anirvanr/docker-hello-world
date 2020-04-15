@@ -98,7 +98,7 @@ stages {
         env.tmp_dir = sh(script: 'set +x ; mktemp -d -t chart-XXXXX', , returnStdout: true).trim()
         def statusCode = sh(script: 
         "set +x && /usr/local/bin/helm fetch chartmuseum/$chart_name --untar --untardir $tmp_dir --version $version && \
-        echo $tmp_dir/$chart_name/$environment-values.yaml", returnStatus: true)
+        [ -f /etc/resolv.conf ] && echo $tmp_dir/$chart_name/$environment-values.yaml || echo $tmp_dir/$chart_name/$environment-values.yaml missing", returnStatus: true)
         echo "$statusCode"
       }
     }
