@@ -80,7 +80,7 @@ stages {
   }
   stage("Choose version") {
     steps {
-      info ("View all versions of chart")
+      info ("Checking all versions of chart")
       script {
         def version_collection
         version_collection = sh (script: "set +x ; /usr/local/bin/helm search --versions \
