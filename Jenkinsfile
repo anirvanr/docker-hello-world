@@ -100,11 +100,8 @@ stages {
         set +x
         /usr/local/bin/helm fetch chartmuseum/$chart_name --untar --untardir $tmp_dir --version $version
         """
-        def status_code = sh(script: "cat $tmp_dir/$chart_name/$environment-values.yaml", returnStatus: true)
-          if ( status_code != 0 ) {
-            currentBuild.result = 'FAILED'
-            error('Exit the build.')
-        }
+        def status_code = sh(script: "set +x ; cat $tmp_dir/$chart_name/$environment-values.yaml", returnStatus: true)
+          if ( status_code != 0 ) { currentBuild.result = 'FAILED' }
       }
     }
   }
