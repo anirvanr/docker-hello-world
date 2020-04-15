@@ -56,7 +56,7 @@ stages {
       }
     }
   }
-  stage("View installed charts") {
+  stage("All releases") {
     steps {
       info ("Checking the information of our deployed chart")
       script{
