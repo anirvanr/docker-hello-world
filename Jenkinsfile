@@ -94,19 +94,17 @@ stages {
   stage("List of values") {
     steps {
       info ("Downloading $environment-values.yaml from a repository to the local filesystem")
-      script{
-        try {
+      script {
         env.tmp_dir = sh(script: 'set +x ; mktemp -d -t chart-XXXXX', , returnStdout: true).trim()
         sh """
         set +x
         /usr/local/bin/helm fetch chartmuseum/$chart_name --untar --untardir $tmp_dir --version $version
-        echo "\033[0;35m\$(<$tmp_dir/$chart_name/$environment-values.yaml)\033[0m"
         """
-        } catch (err) {
-        echo "Failed: ${err}"
+        def status_code = sh(script: "cat $tmp_dir/$chart_name/$environment-values.yaml", returnStatus: true)
+          if ( status_code != 0 ) {
+            currentBuild.result = 'FAILED'
+            error('Exit the build.')
         }
-        // def statusCode = sh(script: "cat $tmp_dir/$chart_name/$environment-values.yaml", returnStatus: true)
-        // echo "$statusCode"
       }
     }
   }
