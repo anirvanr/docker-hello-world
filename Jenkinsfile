@@ -124,10 +124,10 @@ stages {
         if [[ $chart_args = "none" ]]
         then
           echo "\033[0;35m\$(/usr/local/bin/helm upgrade --install $chart_name-$environment --namespace \
-          $environment -f $tmp_dir/$chart_name/$environment-values.yaml chartmuseum/$chart_name --atomic --timeout 30 --dry-run)\033[0m"
+          $environment -f $tmp_dir/$chart_name/$environment-values.yaml chartmuseum/$chart_name --atomic --timeout 30)\033[0m"
         else
           echo "\033[0;35m\$(/usr/local/bin/helm upgrade --install $chart_name-$environment --set $chart_args --namespace \
-          $environment -f $tmp_dir/$chart_name/$environment-values.yaml chartmuseum/$chart_name --atomic --timeout 30 --dry-run)\033[0m"
+          $environment -f $tmp_dir/$chart_name/$environment-values.yaml chartmuseum/$chart_name --atomic --timeout 30)\033[0m"
         fi
         rm -rf $tmp_dir
         """
