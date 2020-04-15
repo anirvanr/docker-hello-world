@@ -84,7 +84,7 @@ stages {
         def version_collection
         version_collection = sh (script: "set +x ; /usr/local/bin/helm search --versions \
         $chart_name | awk '{if (NR!=1) {print \$2}}'", returnStdout: true).trim()
-        echo "\033[0;35m $version_collection \033[0m"
+        echo "\033[0;35m$version_collection \033[0m"
         timeout(time: 1, unit: "MINUTES") {
         version = input message: 'Choose version!', parameters: [choice(name: 'version', choices: "${version_collection}", description: '')]
         }
