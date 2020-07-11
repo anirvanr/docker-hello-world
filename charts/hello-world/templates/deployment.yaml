@@ -11,8 +11,8 @@ spec:
       labels:
         app: hello-world
     spec:
-      imagePullSecrets:
-        - name: dk.dynacommercelab.com
+      # imagePullSecrets:
+      #   - name: dk.dynacommercelab.com
       containers:
         - name: hello-world
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
