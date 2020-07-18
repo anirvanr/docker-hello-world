@@ -5,7 +5,7 @@ This is a simple image that just gives a response on port 8000. Use this to
 test your web orchestration. It's small enough to fit on one floppy disk:
 
 ```bash
-$ docker images | grep hello
+$ docker images | grep hell
 REPOSITORY               TAG       IMAGE ID        CREATED          VIRTUAL SIZE
 crccheck/hello-world     latest    2b28c6ad8d1b    4 months ago     1.13MB
 ```
